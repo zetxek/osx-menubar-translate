@@ -9,23 +9,23 @@
 /* Begin PBXBuildFile section */
 		0AC0CE191C81AEEF00305ACF /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC0CE141C81AEEF00305ACF /* AppDelegate.swift */; };
 		0AC0CE1A1C81AEEF00305ACF /* EventMonitor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC0CE151C81AEEF00305ACF /* EventMonitor.swift */; };
-		0AC0CE1B1C81AEEF00305ACF /* Quote.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC0CE161C81AEEF00305ACF /* Quote.swift */; };
 		0AC0CE1C1C81AEEF00305ACF /* TranslateViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AC0CE171C81AEEF00305ACF /* TranslateViewController.swift */; };
 		0AC0CE1D1C81AEEF00305ACF /* TranslateViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE181C81AEEF00305ACF /* TranslateViewController.xib */; };
 		0AC0CE1F1C81AEF700305ACF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE1E1C81AEF700305ACF /* Images.xcassets */; };
 		0AC0CE231C81AF0400305ACF /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE211C81AF0400305ACF /* MainMenu.xib */; };
 		0AC0CE251C81AF4D00305ACF /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE241C81AF4D00305ACF /* Info.plist */; };
+		0AC0CE271C81B02B00305ACF /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC0CE261C81B02B00305ACF /* WebKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		0AC0CE141C81AEEF00305ACF /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = "Translate Menu/AppDelegate.swift"; sourceTree = SOURCE_ROOT; };
 		0AC0CE151C81AEEF00305ACF /* EventMonitor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EventMonitor.swift; path = "Translate Menu/EventMonitor.swift"; sourceTree = SOURCE_ROOT; };
-		0AC0CE161C81AEEF00305ACF /* Quote.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = Quote.swift; path = "Translate Menu/Quote.swift"; sourceTree = SOURCE_ROOT; };
 		0AC0CE171C81AEEF00305ACF /* TranslateViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TranslateViewController.swift; path = "Translate Menu/TranslateViewController.swift"; sourceTree = SOURCE_ROOT; };
 		0AC0CE181C81AEEF00305ACF /* TranslateViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TranslateViewController.xib; path = "Translate Menu/TranslateViewController.xib"; sourceTree = SOURCE_ROOT; };
 		0AC0CE1E1C81AEF700305ACF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Translate Menu/Images.xcassets"; sourceTree = SOURCE_ROOT; };
 		0AC0CE221C81AF0400305ACF /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = MainMenu.xib; sourceTree = "<group>"; };
 		0AC0CE241C81AF4D00305ACF /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = "Translate Menu/Info.plist"; sourceTree = SOURCE_ROOT; };
+		0AC0CE261C81B02B00305ACF /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		78A6BBCB1ADCB5EE00554D13 /* Translate Menu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Translate Menu.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -34,6 +34,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0AC0CE271C81B02B00305ACF /* WebKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -52,6 +53,7 @@
 		78A6BBC21ADCB5EE00554D13 = {
 			isa = PBXGroup;
 			children = (
+				0AC0CE261C81B02B00305ACF /* WebKit.framework */,
 				78A6BBCD1ADCB5EE00554D13 /* Translate Menu */,
 				78A6BBCC1ADCB5EE00554D13 /* Products */,
 			);
@@ -70,7 +72,6 @@
 			children = (
 				0AC0CE141C81AEEF00305ACF /* AppDelegate.swift */,
 				0AC0CE151C81AEEF00305ACF /* EventMonitor.swift */,
-				0AC0CE161C81AEEF00305ACF /* Quote.swift */,
 				0AC0CE171C81AEEF00305ACF /* TranslateViewController.swift */,
 				0AC0CE181C81AEEF00305ACF /* TranslateViewController.xib */,
 				0AC0CE1E1C81AEF700305ACF /* Images.xcassets */,
@@ -165,7 +166,6 @@
 				0AC0CE1A1C81AEEF00305ACF /* EventMonitor.swift in Sources */,
 				0AC0CE191C81AEEF00305ACF /* AppDelegate.swift in Sources */,
 				0AC0CE1C1C81AEEF00305ACF /* TranslateViewController.swift in Sources */,
-				0AC0CE1B1C81AEEF00305ACF /* Quote.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

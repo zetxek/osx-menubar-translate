@@ -21,41 +21,23 @@
 */
 
 import Cocoa
+import WebKit
 
 class TranslateViewController: NSViewController {
-  @IBOutlet var textLabel: NSTextField!
+  @IBOutlet var webView: WebView!
 
-  let quotes = Quote.all
-
-  var currentQuoteIndex: Int = 0 {
-    didSet {
-      updateQuote()
-    }
-  }
-
-  func updateQuote() {
-    textLabel.stringValue = String(quotes[currentQuoteIndex])
-  }
-
+  
+  
   override func viewWillAppear() {
     super.viewWillAppear()
-
-    currentQuoteIndex = 0
+    webView.customUserAgent = "Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25"
+    webView.mainFrame.loadRequest(NSURLRequest(URL: NSURL(string: "https://translate.google.com")!))
   }
 }
 
 // MARK: Actions
 
 extension TranslateViewController {
-  @IBAction func goLeft(sender: NSButton) {
-    currentQuoteIndex = (currentQuoteIndex - 1 + quotes.count) % quotes.count
-  }
-
-  @IBAction func goRight(sender: NSButton) {
-    currentQuoteIndex = (currentQuoteIndex + 1) % quotes.count
-  }
-
-  @IBAction func quit(sender: NSButton) {
-    NSApplication.sharedApplication().terminate(sender)
-  }
+  
+  
 }
