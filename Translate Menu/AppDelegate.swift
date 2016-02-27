@@ -33,7 +33,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
   func applicationDidFinishLaunching(notification: NSNotification) {
     if let button = statusItem.button {
-      button.image = NSImage(named: "StatusBarButtonImage")
+      button.image = NSImage(named: "TranslateStatusBarButtonImage")
       button.action = Selector("togglePopover:")
     }
 
