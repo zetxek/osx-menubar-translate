@@ -34,5 +34,27 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSServices</key>
+	<array>
+		<dict>
+			<key>NSMenuItem</key>
+			<dict>
+				<key>default</key>
+				<string>Open in MyGreatApp</string>
+			</dict>
+			<key>NSMessage</key>
+			<string>myService</string>
+			<key>NSPortName</key>
+			<string>MenuTranslate</string>
+			<key>NSSendFileTypes</key>
+			<array>
+				<string>public.item</string>
+			</array>
+			<key>NSServiceDescription</key>
+			<string>Translate selected text</string>
+			<key>NSTimeout</key>
+			<string>2000</string>
+		</dict>
+	</array>
 </dict>
 </plist>

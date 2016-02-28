@@ -25,6 +25,7 @@ import WebKit
 
 class TranslateViewController: NSViewController {
   @IBOutlet var webView: WebView!
+    @IBOutlet var popOverViewController: NSPopover!
 
   
   
@@ -38,6 +39,26 @@ class TranslateViewController: NSViewController {
 // MARK: Actions
 
 extension TranslateViewController {
-  
-  
+
+    func dialogOKCancel(question: String, text: String) -> Bool {
+        let myPopup: NSAlert = NSAlert()
+        myPopup.messageText = question
+        myPopup.informativeText = text
+        myPopup.alertStyle = NSAlertStyle.WarningAlertStyle
+        myPopup.addButtonWithTitle("Quit")
+        myPopup.addButtonWithTitle("Cancel")
+        let res = myPopup.runModal()
+        if res == NSAlertFirstButtonReturn {
+            return true
+        }
+        return false
+    }
+
+    
+    @IBAction func clickExit(sender: AnyObject) {
+        let answer = dialogOKCancel("Quit", text: "Do you want to quit?")
+        if (answer){
+        NSApplication.sharedApplication().terminate(self)
+        }
+    }
 }

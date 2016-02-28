@@ -13,7 +13,6 @@
 		0AC0CE1D1C81AEEF00305ACF /* TranslateViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE181C81AEEF00305ACF /* TranslateViewController.xib */; };
 		0AC0CE1F1C81AEF700305ACF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE1E1C81AEF700305ACF /* Images.xcassets */; };
 		0AC0CE231C81AF0400305ACF /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE211C81AF0400305ACF /* MainMenu.xib */; };
-		0AC0CE251C81AF4D00305ACF /* Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE241C81AF4D00305ACF /* Info.plist */; };
 		0AC0CE271C81B02B00305ACF /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC0CE261C81B02B00305ACF /* WebKit.framework */; };
 /* End PBXBuildFile section */
 
@@ -118,7 +117,7 @@
 			attributes = {
 				LastSwiftMigration = 0720;
 				LastSwiftUpdateCheck = 0720;
-				LastUpgradeCheck = 0630;
+				LastUpgradeCheck = 0720;
 				ORGANIZATIONNAME = "Razeware LLC";
 				TargetAttributes = {
 					78A6BBCA1ADCB5EE00554D13 = {
@@ -149,7 +148,6 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				0AC0CE251C81AF4D00305ACF /* Info.plist in Resources */,
 				0AC0CE1D1C81AEEF00305ACF /* TranslateViewController.xib in Resources */,
 				0AC0CE1F1C81AEF700305ACF /* Images.xcassets in Resources */,
 				0AC0CE231C81AF0400305ACF /* MainMenu.xib in Resources */,
@@ -204,6 +202,7 @@
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;

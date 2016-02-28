@@ -24,51 +24,60 @@ import Cocoa
 
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-
-  @IBOutlet weak var window: NSWindow!
-  
-  let statusItem = NSStatusBar.systemStatusBar().statusItemWithLength(-2)
-  let popover = NSPopover()
-  var eventMonitor: EventMonitor?
-
-  func applicationDidFinishLaunching(notification: NSNotification) {
-    if let button = statusItem.button {
-      button.image = NSImage(named: "TranslateStatusBarButtonImage")
-      button.action = Selector("togglePopover:")
+    
+    @IBOutlet weak var window: NSWindow!
+    
+    let statusItem = NSStatusBar.systemStatusBar().statusItemWithLength(-2)
+    let popover = NSPopover()
+    var eventMonitor: EventMonitor?
+    
+    func applicationDidFinishLaunching(notification: NSNotification) {
+        if let button = statusItem.button {
+            button.image = NSImage(named: "TranslateStatusBarButtonImage")
+            button.action = Selector("togglePopover:")
+        }
+        
+        popover.contentViewController = TranslateViewController(nibName: "TranslateViewController", bundle: nil)
+        
+        eventMonitor = EventMonitor(mask: [.LeftMouseDownMask, .RightMouseDownMask]) { [unowned self] event in
+            if self.popover.shown {
+                self.closePopover(event)
+            }
+        }
+        eventMonitor?.start()
+        
+        NSApplication.sharedApplication().servicesProvider = self
+        
+        
     }
-
-    popover.contentViewController = TranslateViewController(nibName: "TranslateViewController", bundle: nil)
-
-    eventMonitor = EventMonitor(mask: [.LeftMouseDownMask, .RightMouseDownMask]) { [unowned self] event in
-      if self.popover.shown {
-        self.closePopover(event)
-      }
+    
+    func applicationWillTerminate(aNotification: NSNotification) {
+        // Insert code here to tear down your application
     }
-    eventMonitor?.start()
-  }
-
-  func applicationWillTerminate(aNotification: NSNotification) {
-    // Insert code here to tear down your application
-  }
-
-  func togglePopover(sender: AnyObject?) {
-    if popover.shown {
-      closePopover(sender)
-    } else {
-      showPopover(sender)
+    
+    func togglePopover(sender: AnyObject?) {
+        if popover.shown {
+            closePopover(sender)
+        } else {
+            showPopover(sender)
+        }
     }
-  }
-
-  func showPopover(sender: AnyObject?) {
-    if let button = statusItem.button {
-      popover.showRelativeToRect(button.bounds, ofView: button, preferredEdge: NSRectEdge.MinY)
+    
+    func showPopover(sender: AnyObject?) {
+        if let button = statusItem.button {
+            popover.showRelativeToRect(button.bounds, ofView: button, preferredEdge: NSRectEdge.MinY)
+        }
+        eventMonitor?.start()
     }
-    eventMonitor?.start()
-  }
-
-  func closePopover(sender: AnyObject?) {
-    popover.performClose(sender)
-    eventMonitor?.stop()
-  }
+    
+    func closePopover(sender: AnyObject?) {
+        popover.performClose(sender)
+        eventMonitor?.stop()
+    }
+    
+    func myService(pboard: NSPasteboard, userData: String, error: AutoreleasingUnsafeMutablePointer<NSString?>) {
+        NSLog("Opening MenuTranslate")
+        
+    }
 }
 

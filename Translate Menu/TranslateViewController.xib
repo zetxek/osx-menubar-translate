@@ -18,11 +18,29 @@
             <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
             <subviews>
                 <webView fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PBX-MI-nbE">
-                    <rect key="frame" x="0.0" y="0.0" width="480" height="272"/>
+                    <rect key="frame" x="0.0" y="0.0" width="480" height="239"/>
                     <webPreferences key="preferences" defaultFontSize="16" defaultFixedFontSize="13" minimumFontSize="0">
                         <nil key="identifier"/>
                     </webPreferences>
                 </webView>
+                <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="qIW-De-fCQ">
+                    <rect key="frame" x="6" y="247" width="226" height="17"/>
+                    <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="MenuBar Translate" id="DWc-2u-i5O">
+                        <font key="font" metaFont="system"/>
+                        <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                        <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                    </textFieldCell>
+                </textField>
+                <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="f73-xg-Riu">
+                    <rect key="frame" x="460" y="246" width="15" height="17"/>
+                    <buttonCell key="cell" type="inline" title="X" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Gse-dW-QUM">
+                        <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                        <font key="font" metaFont="smallSystemBold"/>
+                    </buttonCell>
+                    <connections>
+                        <action selector="clickExit:" target="-2" id="wRJ-i5-QOh"/>
+                    </connections>
+                </button>
             </subviews>
         </customView>
     </objects>
