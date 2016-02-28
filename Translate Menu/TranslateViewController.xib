@@ -32,7 +32,7 @@
                     </textFieldCell>
                 </textField>
                 <button verticalHuggingPriority="750" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="f73-xg-Riu">
-                    <rect key="frame" x="460" y="246" width="15" height="17"/>
+                    <rect key="frame" x="460" y="246" width="17" height="17"/>
                     <buttonCell key="cell" type="inline" title="X" bezelStyle="inline" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="Gse-dW-QUM">
                         <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                         <font key="font" metaFont="smallSystemBold"/>

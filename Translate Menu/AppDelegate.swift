@@ -74,9 +74,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         eventMonitor?.stop()
     }
     
-    func myService(pboard: NSPasteboard, userData: String, error: AutoreleasingUnsafeMutablePointer<NSString?>) {
+    func translateService(pboard: NSPasteboard, userData: String, error: AutoreleasingUnsafeMutablePointer<NSString?>) {
         NSLog("Opening MenuTranslate")
         
+        popover.showRelativeToRect(NSRect.init(x: 0, y: 0, width: 100, height: 100), ofView: (NSApp.mainWindow?.contentView)!, preferredEdge: NSRectEdge.MinY)
     }
 }
 
