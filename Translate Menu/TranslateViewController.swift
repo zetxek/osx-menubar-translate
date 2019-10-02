@@ -23,41 +23,18 @@ import Cocoa
 import WebKit
 
 class TranslateViewController: NSViewController {
-  @IBOutlet var webView: WebView!
+    @IBOutlet var webView: WebView!
     @IBOutlet var popOverViewController: NSPopover!
-
-  
-  
-  override func viewWillAppear() {
-    super.viewWillAppear()
-    webView.customUserAgent = "Mozilla/5.0 (iPad; CPU OS 6_0 like Mac OS X) AppleWebKit/536.26 (KHTML, like Gecko) Version/6.0 Mobile/10A5355d Safari/8536.25"
-    webView.mainFrame.loadRequest(NSURLRequest(URL: NSURL(string: "https://translate.google.com")!))
-  }
-}
-
-// MARK: Actions
-
-extension TranslateViewController {
-
-    func dialogOKCancel(question: String, text: String) -> Bool {
-        let myPopup: NSAlert = NSAlert()
-        myPopup.messageText = question
-        myPopup.informativeText = text
-        myPopup.alertStyle = NSAlertStyle.WarningAlertStyle
-        myPopup.addButtonWithTitle("Quit")
-        myPopup.addButtonWithTitle("Cancel")
-        let res = myPopup.runModal()
-        if res == NSAlertFirstButtonReturn {
-            return true
-        }
-        return false
-    }
-
     
-    @IBAction func clickExit(sender: AnyObject) {
-        let answer = dialogOKCancel("MenuTranslate", text: "Do you want to quit?")
-        if (answer){
-        NSApplication.sharedApplication().terminate(self)
+    var urlLoaded = false
+    
+    override func viewWillAppear() {
+        super.viewWillAppear()
+        
+        if (!self.urlLoaded) {
+            self.urlLoaded = true
+            
+            webView.mainFrame.load(NSURLRequest(url: NSURL(string: "https://translate.google.com")! as URL) as URLRequest)
         }
     }
 }
