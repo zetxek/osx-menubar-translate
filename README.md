@@ -6,6 +6,10 @@ One click, and you're ready to translate.
 
 ![](Docs/service-demo.gif)
 
+## Download
+
+Get the last binary in [the releases section](https://github.com/zetxek/osx-menubar-translate/releases).
+
 ## Contributing
 
 The project just solves a personal need I have: I am Spanish and live in The Netherlands, so often I need to translate texts or words I don't know yet (mostly in Dutch, but also in English as that's my main work language).
