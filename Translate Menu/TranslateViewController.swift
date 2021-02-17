@@ -27,14 +27,36 @@ class TranslateViewController: NSViewController {
     @IBOutlet var popOverViewController: NSPopover!
     
     var urlLoaded = false
+    let defaultUrl = "https://translate.google.com?text="
     
     override func viewWillAppear() {
         super.viewWillAppear()
         
+        NSLog("TranslateViewController: willAppear")
+        
         if (!self.urlLoaded) {
+            NSLog("TranslateViewController: loadURL")
             self.urlLoaded = true
-            
-            webView.mainFrame.load(NSURLRequest(url: NSURL(string: "https://translate.google.com")! as URL) as URLRequest)
+            webView.mainFrame.load(NSURLRequest(url: NSURL(string: defaultUrl)! as URL) as URLRequest)
         }
+    }
+    
+    public func loadText(text: String){
+        NSLog("TranslateViewController, Loading text: " + text)
+        if (webView != nil){
+            webView.mainFrame.load(getTranslateURL(textToTranslate: text))
+        }
+    }
+    
+    public func getTranslateURL(textToTranslate: String) -> URLRequest{
+        
+        var allowedQueryParamAndKey = NSCharacterSet.urlQueryAllowed
+        allowedQueryParamAndKey.remove(charactersIn: ";/?:@&=+$, ")
+        let sanitizedInput = textToTranslate.addingPercentEncoding(withAllowedCharacters: allowedQueryParamAndKey) ?? textToTranslate
+        
+        let urlString = String(format: "%@%@", defaultUrl, sanitizedInput)
+        let url = URL(string: urlString)
+        return NSURLRequest(url: url ?? URL(string: defaultUrl)!) as URLRequest
+
     }
 }

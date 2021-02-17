@@ -27,9 +27,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     
     var statusItem: NSStatusItem!
     let popover = NSPopover()
+    let translateViewController = TranslateViewController(nibName: "TranslateViewController", bundle: nil)
     var eventMonitor: EventMonitor?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
+        NSLog("MenuTranslate: starting")
         self.statusItem = NSStatusBar.system.statusItem(withLength: 32)
         
         let image = NSImage(named: "TranslateStatusBarButtonImage")
@@ -42,7 +44,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             button.sendAction(on: [ .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp ])
         }
         
-        popover.contentViewController = TranslateViewController(nibName: "TranslateViewController", bundle: nil)
+        popover.contentViewController = translateViewController
         
         eventMonitor = EventMonitor(mask: [.leftMouseDown, .rightMouseDown]) { [unowned self] event in
             if self.popover.isShown {
@@ -53,6 +55,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         eventMonitor?.start()
         
         NSApplication.shared.servicesProvider = self
+        NSLog("MenuTranslate: started")
+
     }
     
     @IBAction
@@ -78,7 +82,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
     
-    func showPopover(sender: AnyObject?) {
+    func showPopover(sender: AnyObject?, keyword : String? = nil) {
         if let button = statusItem.button {
             popover.show(relativeTo: button.bounds, of: button, preferredEdge: NSRectEdge.minY)
         }
@@ -91,9 +95,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         eventMonitor?.stop()
     }
     
-    @objc func translateService(_ pboard: NSPasteboard, userData: String, error: AutoreleasingUnsafeMutablePointer<NSString?>) {
-        NSLog("Opening MenuTranslate")
-        self.showPopover(sender: nil)
+    @objc func translateService(_ pasteboard: NSPasteboard, userData: String, error: AutoreleasingUnsafeMutablePointer<NSString?>) {
+        let text = pasteboard.string(forType: .string)
+        NSLog("MenuTranslate: handling service invocation: " + text!)
+        translateViewController.loadText(text: text!)
+        self.showPopover(sender: nil, keyword: text)
     }
     
     @IBAction func quitApp(_ sender: Any) {
