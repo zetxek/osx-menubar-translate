@@ -13,8 +13,42 @@
 		0AC0CE1D1C81AEEF00305ACF /* TranslateViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE181C81AEEF00305ACF /* TranslateViewController.xib */; };
 		0AC0CE1F1C81AEF700305ACF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE1E1C81AEF700305ACF /* Images.xcassets */; };
 		0AC0CE271C81B02B00305ACF /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC0CE261C81B02B00305ACF /* WebKit.framework */; };
+		0AED379728CFC5DF00CE461A /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AED379628CFC5DF00CE461A /* SafariWebExtensionHandler.swift */; };
+		0AED379A28CFC5DF00CE461A /* _locales in Resources */ = {isa = PBXBuildFile; fileRef = 0AED379928CFC5DF00CE461A /* _locales */; };
+		0AED379C28CFC5DF00CE461A /* images in Resources */ = {isa = PBXBuildFile; fileRef = 0AED379B28CFC5DF00CE461A /* images */; };
+		0AED379E28CFC5DF00CE461A /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = 0AED379D28CFC5DF00CE461A /* manifest.json */; };
+		0AED37A028CFC5DF00CE461A /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = 0AED379F28CFC5DF00CE461A /* background.js */; };
+		0AED37A228CFC5DF00CE461A /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = 0AED37A128CFC5DF00CE461A /* content.js */; };
+		0AED37A428CFC5DF00CE461A /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = 0AED37A328CFC5DF00CE461A /* popup.html */; };
+		0AED37A628CFC5DF00CE461A /* popup.css in Resources */ = {isa = PBXBuildFile; fileRef = 0AED37A528CFC5DF00CE461A /* popup.css */; };
+		0AED37A828CFC5DF00CE461A /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = 0AED37A728CFC5DF00CE461A /* popup.js */; };
+		0AED37AD28CFC5DF00CE461A /* Translate Menu Safari.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 0AED379428CFC5DF00CE461A /* Translate Menu Safari.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		E7DE0D3B2344A24C00A9CBAD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = E7DE0D3A2344A24C00A9CBAD /* MainMenu.xib */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		0AED37AB28CFC5DF00CE461A /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 78A6BBC31ADCB5EE00554D13 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 0AED379328CFC5DF00CE461A;
+			remoteInfo = "Translate Menu Safari";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0AED37AE28CFC5DF00CE461A /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				0AED37AD28CFC5DF00CE461A /* Translate Menu Safari.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		0AC0CE141C81AEEF00305ACF /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = "Translate Menu/AppDelegate.swift"; sourceTree = SOURCE_ROOT; };
@@ -23,12 +57,31 @@
 		0AC0CE181C81AEEF00305ACF /* TranslateViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TranslateViewController.xib; path = "Translate Menu/TranslateViewController.xib"; sourceTree = SOURCE_ROOT; };
 		0AC0CE1E1C81AEF700305ACF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Translate Menu/Images.xcassets"; sourceTree = SOURCE_ROOT; };
 		0AC0CE261C81B02B00305ACF /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		0AED379428CFC5DF00CE461A /* Translate Menu Safari.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Translate Menu Safari.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		0AED379628CFC5DF00CE461A /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		0AED379928CFC5DF00CE461A /* _locales */ = {isa = PBXFileReference; lastKnownFileType = folder; path = _locales; sourceTree = "<group>"; };
+		0AED379B28CFC5DF00CE461A /* images */ = {isa = PBXFileReference; lastKnownFileType = folder; path = images; sourceTree = "<group>"; };
+		0AED379D28CFC5DF00CE461A /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; path = manifest.json; sourceTree = "<group>"; };
+		0AED379F28CFC5DF00CE461A /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = background.js; sourceTree = "<group>"; };
+		0AED37A128CFC5DF00CE461A /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = content.js; sourceTree = "<group>"; };
+		0AED37A328CFC5DF00CE461A /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; path = popup.html; sourceTree = "<group>"; };
+		0AED37A528CFC5DF00CE461A /* popup.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = popup.css; sourceTree = "<group>"; };
+		0AED37A728CFC5DF00CE461A /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = popup.js; sourceTree = "<group>"; };
+		0AED37A928CFC5DF00CE461A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		0AED37AA28CFC5DF00CE461A /* Translate_Menu_Safari.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Translate_Menu_Safari.entitlements; sourceTree = "<group>"; };
 		78A6BBCB1ADCB5EE00554D13 /* Translate Menu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Translate Menu.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7DE0D382344A22D00A9CBAD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = "Translate Menu/Info.plist"; sourceTree = SOURCE_ROOT; };
 		E7DE0D3A2344A24C00A9CBAD /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = "Translate Menu/MainMenu.xib"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		0AED379128CFC5DF00CE461A /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		78A6BBC81ADCB5EE00554D13 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -40,11 +93,38 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0AED379528CFC5DF00CE461A /* Translate Menu Safari */ = {
+			isa = PBXGroup;
+			children = (
+				0AED379628CFC5DF00CE461A /* SafariWebExtensionHandler.swift */,
+				0AED37A928CFC5DF00CE461A /* Info.plist */,
+				0AED37AA28CFC5DF00CE461A /* Translate_Menu_Safari.entitlements */,
+				0AED379828CFC5DF00CE461A /* Resources */,
+			);
+			path = "Translate Menu Safari";
+			sourceTree = "<group>";
+		};
+		0AED379828CFC5DF00CE461A /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				0AED379928CFC5DF00CE461A /* _locales */,
+				0AED379B28CFC5DF00CE461A /* images */,
+				0AED379D28CFC5DF00CE461A /* manifest.json */,
+				0AED379F28CFC5DF00CE461A /* background.js */,
+				0AED37A128CFC5DF00CE461A /* content.js */,
+				0AED37A328CFC5DF00CE461A /* popup.html */,
+				0AED37A528CFC5DF00CE461A /* popup.css */,
+				0AED37A728CFC5DF00CE461A /* popup.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
 		78A6BBC21ADCB5EE00554D13 = {
 			isa = PBXGroup;
 			children = (
 				0AC0CE261C81B02B00305ACF /* WebKit.framework */,
 				78A6BBCD1ADCB5EE00554D13 /* Translate Menu */,
+				0AED379528CFC5DF00CE461A /* Translate Menu Safari */,
 				78A6BBCC1ADCB5EE00554D13 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -53,6 +133,7 @@
 			isa = PBXGroup;
 			children = (
 				78A6BBCB1ADCB5EE00554D13 /* Translate Menu.app */,
+				0AED379428CFC5DF00CE461A /* Translate Menu Safari.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -75,6 +156,23 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		0AED379328CFC5DF00CE461A /* Translate Menu Safari */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0AED37B128CFC5DF00CE461A /* Build configuration list for PBXNativeTarget "Translate Menu Safari" */;
+			buildPhases = (
+				0AED379028CFC5DF00CE461A /* Sources */,
+				0AED379128CFC5DF00CE461A /* Frameworks */,
+				0AED379228CFC5DF00CE461A /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Translate Menu Safari";
+			productName = "Translate Menu Safari";
+			productReference = 0AED379428CFC5DF00CE461A /* Translate Menu Safari.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		78A6BBCA1ADCB5EE00554D13 /* Translate Menu */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 78A6BBE51ADCB5EE00554D13 /* Build configuration list for PBXNativeTarget "Translate Menu" */;
@@ -82,10 +180,12 @@
 				78A6BBC71ADCB5EE00554D13 /* Sources */,
 				78A6BBC81ADCB5EE00554D13 /* Frameworks */,
 				78A6BBC91ADCB5EE00554D13 /* Resources */,
+				0AED37AE28CFC5DF00CE461A /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				0AED37AC28CFC5DF00CE461A /* PBXTargetDependency */,
 			);
 			name = "Translate Menu";
 			productName = Quotes;
@@ -99,10 +199,14 @@
 			isa = PBXProject;
 			attributes = {
 				LastSwiftMigration = 0720;
-				LastSwiftUpdateCheck = 0720;
+				LastSwiftUpdateCheck = 1340;
 				LastUpgradeCheck = 1240;
 				ORGANIZATIONNAME = "Razeware LLC";
 				TargetAttributes = {
+					0AED379328CFC5DF00CE461A = {
+						CreatedOnToolsVersion = 13.4.1;
+						ProvisioningStyle = Automatic;
+					};
 					78A6BBCA1ADCB5EE00554D13 = {
 						CreatedOnToolsVersion = 6.3;
 						ProvisioningStyle = Manual;
@@ -123,11 +227,27 @@
 			projectRoot = "";
 			targets = (
 				78A6BBCA1ADCB5EE00554D13 /* Translate Menu */,
+				0AED379328CFC5DF00CE461A /* Translate Menu Safari */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		0AED379228CFC5DF00CE461A /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0AED37A028CFC5DF00CE461A /* background.js in Resources */,
+				0AED37A628CFC5DF00CE461A /* popup.css in Resources */,
+				0AED37A428CFC5DF00CE461A /* popup.html in Resources */,
+				0AED379C28CFC5DF00CE461A /* images in Resources */,
+				0AED379E28CFC5DF00CE461A /* manifest.json in Resources */,
+				0AED379A28CFC5DF00CE461A /* _locales in Resources */,
+				0AED37A228CFC5DF00CE461A /* content.js in Resources */,
+				0AED37A828CFC5DF00CE461A /* popup.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		78A6BBC91ADCB5EE00554D13 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -141,6 +261,14 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		0AED379028CFC5DF00CE461A /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0AED379728CFC5DF00CE461A /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		78A6BBC71ADCB5EE00554D13 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -153,7 +281,90 @@
 		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		0AED37AC28CFC5DF00CE461A /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 0AED379328CFC5DF00CE461A /* Translate Menu Safari */;
+			targetProxy = 0AED37AB28CFC5DF00CE461A /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		0AED37AF28CFC5DF00CE461A /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "Translate Menu Safari/Translate_Menu_Safari.entitlements";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Translate Menu Safari/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Translate Menu Safari";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Razeware LLC. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "info.adrianmoreno.Translate-Menu.Translate-Menu-Safari";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		0AED37B028CFC5DF00CE461A /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++17";
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CODE_SIGN_ENTITLEMENTS = "Translate Menu Safari/Translate_Menu_Safari.entitlements";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = "";
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Translate Menu Safari/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Translate Menu Safari";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "Copyright © 2022 Razeware LLC. All rights reserved.";
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @executable_path/../../../../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 12.3;
+				MARKETING_VERSION = 1.0;
+				MTL_FAST_MATH = YES;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "info.adrianmoreno.Translate-Menu.Translate-Menu-Safari";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 		78A6BBE31ADCB5EE00554D13 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -263,6 +474,7 @@
 		78A6BBE61ADCB5EE00554D13 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
@@ -281,6 +493,7 @@
 		78A6BBE71ADCB5EE00554D13 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Manual;
@@ -299,6 +512,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		0AED37B128CFC5DF00CE461A /* Build configuration list for PBXNativeTarget "Translate Menu Safari" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0AED37AF28CFC5DF00CE461A /* Debug */,
+				0AED37B028CFC5DF00CE461A /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		78A6BBC61ADCB5EE00554D13 /* Build configuration list for PBXProject "Translate Menu" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
