@@ -1,6 +1,6 @@
 # README #
 
-MenuBar Translate is a very simple app that lets you have a quick shortcut to Google Translate in your OS X menu bar and integrate it with the OS X "Services" menu. It's main purpose is to allow you to have Google Translate by hand at all times, without needing to open a new browser window.
+MenuBar Translate is a very simple app that lets you have a quick shortcut to Google Translate in your OS X menu bar and integrate it with the OS X "Services" menu. Its main purpose is to allow you to have Google Translate by hand at all times, without needing to open a new browser window.
 
 One click, and you're ready to translate.
 
