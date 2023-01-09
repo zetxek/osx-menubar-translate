@@ -275,7 +275,7 @@
 				INFOPLIST_FILE = "Translate Menu/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "info.adrianmoreno.Translate-Menu";
 				PRODUCT_NAME = "Translate Menu";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -295,7 +295,7 @@
 				INFOPLIST_FILE = "Translate Menu/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks";
 				MACOSX_DEPLOYMENT_TARGET = "$(RECOMMENDED_MACOSX_DEPLOYMENT_TARGET)";
-				MARKETING_VERSION = 1.1;
+				MARKETING_VERSION = 1.1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = "info.adrianmoreno.Translate-Menu";
 				PRODUCT_NAME = "Translate Menu";
 				PROVISIONING_PROFILE_SPECIFIER = "";
