@@ -78,7 +78,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 showPopover(sender: sender)
             }
         } else if (secondaryDown) {
-            self.statusItem.popUpMenu(self.statusMenu)
+            statusItem.menu = self.statusMenu
+            statusItem.button?.performClick(nil)
+            statusItem.menu = nil
         }
     }
     

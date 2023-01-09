@@ -23,7 +23,7 @@ import Cocoa
 import WebKit
 
 class TranslateViewController: NSViewController {
-    @IBOutlet var webView: WebView!
+    @IBOutlet var webView: WKWebView!
     @IBOutlet var popOverViewController: NSPopover!
     
     var urlLoaded = false
@@ -37,14 +37,14 @@ class TranslateViewController: NSViewController {
         if (!self.urlLoaded) {
             NSLog("TranslateViewController: loadURL")
             self.urlLoaded = true
-            webView.mainFrame.load(NSURLRequest(url: NSURL(string: defaultUrl)! as URL) as URLRequest)
+            webView.load(NSURLRequest(url: NSURL(string: defaultUrl)! as URL) as URLRequest)
         }
     }
     
     public func loadText(text: String){
         NSLog("TranslateViewController, Loading text: " + text)
         if (webView != nil){
-            webView.mainFrame.load(getTranslateURL(textToTranslate: text))
+            webView.load(getTranslateURL(textToTranslate: text))
         }
     }
     
