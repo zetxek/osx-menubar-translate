@@ -6,9 +6,12 @@ One click, and you're ready to translate.
 
 ![](Docs/service-demo.gif)
 
+The app has no tracking at all (well, except the one that Google will do on the Translate instance loaded in the embedded WebView - but nothing by me). Code-wise it might also serve you as a blueprint to implement a embedded webview, with a service to receive text from other contexts.
+
 ## Download
 
 Get the last binary in [the releases section](https://github.com/zetxek/osx-menubar-translate/releases).
+Unzip the file, and drag&drop to the Applications folder. Ready!
 
 ## Contributing
 
