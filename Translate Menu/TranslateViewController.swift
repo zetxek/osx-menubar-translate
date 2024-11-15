@@ -26,6 +26,8 @@ class TranslateViewController: NSViewController {
     @IBOutlet var webView: WKWebView!
     @IBOutlet var popOverViewController: NSPopover!
     
+    override var acceptsFirstResponder: Bool { return true }
+    
     var urlLoaded = false
     let defaultUrl = "https://translate.google.com?text="
     
