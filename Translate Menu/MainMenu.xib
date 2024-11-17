@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
+        <deployment identifier="macosx"/>
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
     </dependencies>
     <objects>
@@ -16,7 +17,6 @@
                 <outlet property="statusMenu" destination="CJx-Hc-3bo" id="ECK-aB-8Hl"/>
             </connections>
         </customObject>
-        <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <menu id="CJx-Hc-3bo">
             <items>
                 <menuItem title="Version XXX" id="Lwn-HC-wyy">
@@ -24,6 +24,9 @@
                 </menuItem>
                 <menuItem title="About Translate Menu" id="OqD-PK-giP">
                     <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="aboutMenuActivatedWithSender:" target="-1" id="gIz-wT-ijM"/>
+                    </connections>
                 </menuItem>
                 <menuItem title="Quit Translate Menu" id="6XE-G3-hw7">
                     <modifierMask key="keyEquivalentModifierMask"/>

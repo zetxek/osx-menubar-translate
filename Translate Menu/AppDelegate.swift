@@ -106,4 +106,12 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction func quitApp(_ sender: Any) {
         NSApplication.shared.terminate(self)
     }
+    
+    
+    @IBAction
+    func aboutMenuActivated(sender: AnyObject?) {
+        NSLog("MenuTranslate: opening github site")
+        NSWorkspace().open(URL(string: "https://github.com/zetxek/osx-menubar-translate")!)
+    }
+    
 }

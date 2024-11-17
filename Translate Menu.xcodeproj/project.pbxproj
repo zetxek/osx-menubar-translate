@@ -13,6 +13,7 @@
 		0AC0CE1D1C81AEEF00305ACF /* TranslateViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE181C81AEEF00305ACF /* TranslateViewController.xib */; };
 		0AC0CE1F1C81AEF700305ACF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE1E1C81AEF700305ACF /* Images.xcassets */; };
 		0AC0CE271C81B02B00305ACF /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC0CE261C81B02B00305ACF /* WebKit.framework */; };
+		5077E61A2CEA791500EFBF1B /* TranslateWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077E6192CEA791500EFBF1B /* TranslateWebView.swift */; };
 		E7DE0D3B2344A24C00A9CBAD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = E7DE0D3A2344A24C00A9CBAD /* MainMenu.xib */; };
 /* End PBXBuildFile section */
 
@@ -23,6 +24,7 @@
 		0AC0CE181C81AEEF00305ACF /* TranslateViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TranslateViewController.xib; path = "Translate Menu/TranslateViewController.xib"; sourceTree = SOURCE_ROOT; };
 		0AC0CE1E1C81AEF700305ACF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Translate Menu/Images.xcassets"; sourceTree = SOURCE_ROOT; };
 		0AC0CE261C81B02B00305ACF /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		5077E6192CEA791500EFBF1B /* TranslateWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateWebView.swift; sourceTree = SOURCE_ROOT; };
 		78A6BBCB1ADCB5EE00554D13 /* Translate Menu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Translate Menu.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7DE0D382344A22D00A9CBAD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = "Translate Menu/Info.plist"; sourceTree = SOURCE_ROOT; };
 		E7DE0D3A2344A24C00A9CBAD /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = "Translate Menu/MainMenu.xib"; sourceTree = SOURCE_ROOT; };
@@ -65,6 +67,7 @@
 				0AC0CE171C81AEEF00305ACF /* TranslateViewController.swift */,
 				0AC0CE181C81AEEF00305ACF /* TranslateViewController.xib */,
 				E7DE0D3A2344A24C00A9CBAD /* MainMenu.xib */,
+				5077E6192CEA791500EFBF1B /* TranslateWebView.swift */,
 				0AC0CE1E1C81AEF700305ACF /* Images.xcassets */,
 				E7DE0D382344A22D00A9CBAD /* Info.plist */,
 			);
@@ -147,6 +150,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5077E61A2CEA791500EFBF1B /* TranslateWebView.swift in Sources */,
 				0AC0CE1A1C81AEEF00305ACF /* EventMonitor.swift in Sources */,
 				0AC0CE191C81AEEF00305ACF /* AppDelegate.swift in Sources */,
 				0AC0CE1C1C81AEEF00305ACF /* TranslateViewController.swift in Sources */,
