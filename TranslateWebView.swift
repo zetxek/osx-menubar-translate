@@ -61,8 +61,8 @@ class TranslateWebView: WKWebView {
         if let copiedString = pasteboard.string(forType: .string) {
             // Use the copied string
             print("Pasted: \(copiedString)")
-            pasteboard.
-        }
+            let javascript = "document.execCommand('insertText', false, '\(copiedString)');"
+            self.evaluateJavaScript(javascript, completionHandler: nil)        }
     }
     
     
