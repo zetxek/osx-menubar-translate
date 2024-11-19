@@ -18,51 +18,50 @@ class TranslateWebView: WKWebView {
     override func keyDown(with event: NSEvent) {
         NSLog("keyDown translateWebView: " + (event.characters ?? "") )
         
-        
         switch event.modifierFlags.intersection(.deviceIndependentFlagsMask) {
         case [.command] where event.characters == "c":
-            NSLog("c -> copy")
             self.copy(event)
         case [.command] where event.characters == "v":
             self.paste(event)
+        case [.command] where event.characters == "a":
+            self.selectAll(event)
         default:
             break
         }
         
-        if [48, 34, 40, 4, 1, 3, 32].contains(event.keyCode) {
-            // no funk
-        } else {
-            NSLog("super key down")
-            super.keyDown(with: event)
-        }
-        
-        
-        
+        super.keyDown(with: event)
     }
     
     public func keyPress(event: NSEvent){
         super.keyDown(with: event)
     }
+
     
+    @IBAction override func selectAll(_ sender: Any?) {
+        NSLog("Select all");
+        super.selectAll(sender)
+    }
+
     
     @IBAction func copy(_ sender: Any?) {
-        // Implement your copy logic here
-        NSLog("copy!")
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
-        pasteboard.setString("Your data to copy", forType: .string)
+        
+        
+        let script = "window.getSelection().toString()";
+        self.evaluateJavaScript(script){ selectedText, error in
+            pasteboard.setString(selectedText as! String, forType: .string)
+        }
     }
 
     @IBAction func paste(_ sender: Any?) {
-        NSLog("paste!")
-
-        // Implement your paste logic here
         let pasteboard = NSPasteboard.general
         if let copiedString = pasteboard.string(forType: .string) {
             // Use the copied string
             print("Pasted: \(copiedString)")
             let javascript = "document.execCommand('insertText', false, '\(copiedString)');"
-            self.evaluateJavaScript(javascript, completionHandler: nil)        }
+            self.evaluateJavaScript(javascript, completionHandler: nil)
+        }
     }
     
     
