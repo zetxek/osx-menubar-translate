@@ -22,17 +22,24 @@
 import Cocoa
 import WebKit
 
-class TranslateViewController: NSViewController {
-    @IBOutlet var webView: WKWebView!
+class TranslateViewController: NSViewController, WKNavigationDelegate {
+    @IBOutlet var webView: TranslateWebView!
+    @IBOutlet var webViewContainer: NSView!
+    @IBOutlet var progressIndicator: NSProgressIndicator!
+    
     @IBOutlet var popOverViewController: NSPopover!
+    
+    override var acceptsFirstResponder: Bool { return false }
     
     var urlLoaded = false
     let defaultUrl = "https://translate.google.com?text="
+    
     
     override func viewWillAppear() {
         super.viewWillAppear()
         
         NSLog("TranslateViewController: willAppear")
+        progressIndicator.display()
         
         if (!self.urlLoaded) {
             NSLog("TranslateViewController: loadURL")
@@ -40,6 +47,12 @@ class TranslateViewController: NSViewController {
             webView.load(NSURLRequest(url: NSURL(string: defaultUrl)! as URL) as URLRequest)
         }
     }
+    
+    func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        NSLog("URL did Finish")
+        progressIndicator.isHidden = true
+    }
+    
     
     public func loadText(text: String){
         NSLog("TranslateViewController, Loading text: " + text)
@@ -59,4 +72,22 @@ class TranslateViewController: NSViewController {
         return NSURLRequest(url: url ?? URL(string: defaultUrl)!) as URLRequest
 
     }
+
+    public override func keyDown(with event: NSEvent) {
+        NSLog("keyDown in TranslateviewController: " + (event.characters ?? "") )
+        switch event.modifierFlags.intersection(.deviceIndependentFlagsMask) {
+        case [.command] where event.characters == "c",
+             [.command ] where event.characters == "v",
+             [.command ] where event.characters == "a":
+            print("cmd + c / v / a")
+        default:
+            break
+        }
+        
+        var logMsg = "key = " + (event.charactersIgnoringModifiers
+            ?? "")
+        logMsg += "\ncharacter = " + (event.characters ?? "")
+        NSLog(logMsg)
+    }
+
 }

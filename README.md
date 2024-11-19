@@ -6,7 +6,17 @@ One click, and you're ready to translate.
 
 ![](Docs/service-demo.gif)
 
+You can open the application from your menubar, as well as from OS X contextual service ("Services > Translate in MenuTranslate"):
+
+![2024-11-19 21 32 57](https://github.com/user-attachments/assets/433a4b0c-2f0d-4782-926c-1f7b8c5ace09)
+
 The app has no tracking at all (well, except the one that Google will do on the Translate instance loaded in the embedded WebView - but nothing by me). Code-wise it might also serve you as a blueprint to implement a embedded webview, with a service to receive text from other contexts.
+
+## Supported key shortcuts
+
+- `cmd + a` to **select all**
+- `cmd + c` to **copy**
+- `cmd + v` to **paste**
 
 ## Download
 

@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="21507" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="23504" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="21507"/>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="23504"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -16,17 +17,25 @@
                 <outlet property="statusMenu" destination="CJx-Hc-3bo" id="ECK-aB-8Hl"/>
             </connections>
         </customObject>
-        <customObject id="YLy-65-1bz" customClass="NSFontManager"/>
         <menu id="CJx-Hc-3bo">
             <items>
-                <menuItem title="Quit Translate Menu" id="Lwn-HC-wyy">
+                <menuItem title="Version 1.2.1" id="Lwn-HC-wyy">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                </menuItem>
+                <menuItem title="About Translate Menu" id="OqD-PK-giP">
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <connections>
-                        <action selector="quitApp:" target="Voe-Tx-rLC" id="1Et-qf-NyS"/>
+                        <action selector="aboutMenuActivatedWithSender:" target="-1" id="gIz-wT-ijM"/>
+                    </connections>
+                </menuItem>
+                <menuItem title="Quit Translate Menu" id="6XE-G3-hw7">
+                    <modifierMask key="keyEquivalentModifierMask"/>
+                    <connections>
+                        <action selector="quitApp:" target="Voe-Tx-rLC" id="ctN-IW-X9k"/>
                     </connections>
                 </menuItem>
             </items>
-            <point key="canvasLocation" x="-110" y="-65"/>
+            <point key="canvasLocation" x="-110" y="-65.5"/>
         </menu>
     </objects>
 </document>
