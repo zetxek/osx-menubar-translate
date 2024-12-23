@@ -109,8 +109,6 @@
 				TargetAttributes = {
 					78A6BBCA1ADCB5EE00554D13 = {
 						CreatedOnToolsVersion = 6.3;
-						DevelopmentTeam = 2VZWF2E5YD;
-						ProvisioningStyle = Automatic;
 					};
 				};
 			};
@@ -275,7 +273,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "-";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development: zetxek@yahoo.es (Z453ZP23X8)";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
@@ -301,12 +299,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_IDENTITY = "Apple Distribution";
-				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "Apple Distribution: ADRIAN MORENO PEÑA (2VZWF2E5YD)";
+				"CODE_SIGN_IDENTITY[sdk=*]" = "Apple Distribution: ADRIAN MORENO PEÑA (2VZWF2E5YD)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Distribution: ADRIAN MORENO PEÑA (2VZWF2E5YD)";
+				CODE_SIGN_STYLE = Manual;
 				COMBINE_HIDPI_IMAGES = YES;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = 2VZWF2E5YD;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=macosx*]" = 2VZWF2E5YD;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				INFOPLIST_FILE = "Translate Menu/Info.plist";
@@ -320,6 +320,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "info.adrianmoreno.Translate-Menu";
 				PRODUCT_NAME = "Translate Menu";
 				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "Translate Menu OS X - app store profile";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
