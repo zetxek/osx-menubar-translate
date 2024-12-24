@@ -25,6 +25,7 @@
 		0AC0CE1E1C81AEF700305ACF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Translate Menu/Images.xcassets"; sourceTree = SOURCE_ROOT; };
 		0AC0CE261C81B02B00305ACF /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		5077E6192CEA791500EFBF1B /* TranslateWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateWebView.swift; sourceTree = SOURCE_ROOT; };
+		507C65442D1ABDF00074FB46 /* Translate Menu.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Translate Menu.entitlements"; path = "Translate Menu/Translate Menu.entitlements"; sourceTree = SOURCE_ROOT; };
 		78A6BBCB1ADCB5EE00554D13 /* Translate Menu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Translate Menu.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E7DE0D382344A22D00A9CBAD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = "Translate Menu/Info.plist"; sourceTree = SOURCE_ROOT; };
 		E7DE0D3A2344A24C00A9CBAD /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = "Translate Menu/MainMenu.xib"; sourceTree = SOURCE_ROOT; };
@@ -62,6 +63,7 @@
 		78A6BBCD1ADCB5EE00554D13 /* Translate Menu */ = {
 			isa = PBXGroup;
 			children = (
+				507C65442D1ABDF00074FB46 /* Translate Menu.entitlements */,
 				0AC0CE141C81AEEF00305ACF /* AppDelegate.swift */,
 				0AC0CE151C81AEEF00305ACF /* EventMonitor.swift */,
 				0AC0CE171C81AEEF00305ACF /* TranslateViewController.swift */,
@@ -191,9 +193,10 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -250,9 +253,10 @@
 				COPY_PHASE_STRIP = NO;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_APP_SANDBOX = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
@@ -272,6 +276,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "Translate Menu/Translate Menu.entitlements";
 				CODE_SIGN_IDENTITY = "-";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
@@ -299,6 +304,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = "Translate Menu/Translate Menu.entitlements";
 				CODE_SIGN_IDENTITY = "Apple Distribution: ADRIAN MORENO PEÑA (2VZWF2E5YD)";
 				"CODE_SIGN_IDENTITY[sdk=*]" = "Apple Distribution: ADRIAN MORENO PEÑA (2VZWF2E5YD)";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Distribution: ADRIAN MORENO PEÑA (2VZWF2E5YD)";
