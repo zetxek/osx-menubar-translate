@@ -291,8 +291,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.2.1;
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "info.adrianmoreno.Translate-Menu";
 				PRODUCT_NAME = "Translate Menu";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -321,8 +321,8 @@
 					"$(inherited)",
 					"@executable_path/../Frameworks",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 11.0;
-				MARKETING_VERSION = 1.2.1;
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
+				MARKETING_VERSION = 1.2.2;
 				PRODUCT_BUNDLE_IDENTIFIER = "info.adrianmoreno.Translate-Menu";
 				PRODUCT_NAME = "Translate Menu";
 				PROVISIONING_PROFILE_SPECIFIER = "";
