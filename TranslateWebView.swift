@@ -22,8 +22,6 @@ class TranslateWebView: WKWebView {
     }
 
     override func keyDown(with event: NSEvent) {
-        NSLog("TranslateWebView keyDown: " + (event.characters ?? ""))
-
         let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
 
         switch flags {
@@ -44,13 +42,7 @@ class TranslateWebView: WKWebView {
         }
     }
 
-    func keyPress(event: NSEvent) {
-        super.keyDown(with: event)
-    }
-
     @IBAction override func selectAll(_ sender: Any?) {
-        NSLog("TranslateWebView: selectAll")
-
         let javascript = """
         (function() {
             const active = document.activeElement;
@@ -107,11 +99,10 @@ class TranslateWebView: WKWebView {
         let pasteboard = NSPasteboard.general
         guard let copiedString = pasteboard.string(forType: .string) else { return }
 
-        let escaped = copiedString
-            .replacingOccurrences(of: "\\\\", with: "\\\\\\\\")
-            .replacingOccurrences(of: "'", with: "\\\\'")
-            .replacingOccurrences(of: "\n", with: "\\\\n")
-            .replacingOccurrences(of: "\r", with: "\\\\r")
+        // JSON-encode to get a valid JS string literal (handles quotes, backslashes, newlines)
+        guard let data = try? JSONSerialization.data(withJSONObject: [copiedString]),
+              let json = String(data: data, encoding: .utf8) else { return }
+        let literal = String(json.dropFirst().dropLast())
 
         let javascript = """
         (function() {
@@ -119,7 +110,7 @@ class TranslateWebView: WKWebView {
             if (active) {
                 active.focus();
             }
-            document.execCommand('insertText', false, '\(escaped)');
+            document.execCommand('insertText', false, \(literal));
         })();
         """
 

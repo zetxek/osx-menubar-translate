@@ -31,8 +31,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var eventMonitor: EventMonitor?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSLog("MenuTranslate: starting")
-
         statusItem = NSStatusBar.system.statusItem(withLength: 32)
 
         let image = NSImage(named: "TranslateStatusBarButtonImage")
@@ -41,67 +39,53 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let button = statusItem.button {
             button.image = image
             button.action = #selector(statusItemButtonActivated(sender:))
-            button.sendAction(on: [.leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp])
+            button.sendAction(on: [.leftMouseDown, .rightMouseDown])
         }
 
         popover.contentViewController = translateViewController
         popover.behavior = .applicationDefined
 
+        // ponytail: geometry check keeps IME candidate clicks (which overlap the
+        // popover but belong to the input-method process) from dismissing it
         eventMonitor = EventMonitor(mask: [.leftMouseDown, .rightMouseDown]) { [unowned self] event in
-            guard self.popover.isShown else { return }
-
-            if let clickedWindow = event?.window,
-               let popoverWindow = self.popover.contentViewController?.view.window,
-               clickedWindow == popoverWindow {
-                return
-            }
+            guard self.popover.isShown,
+                  let frame = self.popover.contentViewController?.view.window?.frame,
+                  !NSMouseInRect(NSEvent.mouseLocation, frame, false)
+            else { return }
 
             self.closePopover(sender: event)
         }
 
         NSApplication.shared.servicesProvider = self
-        NSLog("MenuTranslate: started")
     }
 
     @IBAction
     func statusItemButtonActivated(sender: AnyObject?) {
-        let buttonMask = NSEvent.pressedMouseButtons
-        var primaryDown = ((buttonMask & (1 << 0)) != 0)
-        var secondaryDown = ((buttonMask & (1 << 1)) != 0)
+        // Decide from the triggering event, not live mouse state — by the time
+        // this runs the button may already be released and a state read misses the click.
+        let event = NSApp.currentEvent
+        let isSecondary = event?.type == .rightMouseDown
+            || event?.modifierFlags.contains(.control) == true
 
-        if primaryDown && (NSEvent.modifierFlags == .control) {
-            primaryDown = false
-            secondaryDown = true
-        }
-
-        if primaryDown {
-            if popover.isShown {
-                closePopover(sender: sender)
-            } else {
-                showPopover(sender: sender)
-            }
-        } else if secondaryDown {
+        if isSecondary {
             statusItem.menu = self.statusMenu
             statusItem.button?.performClick(nil)
             statusItem.menu = nil
+        } else if popover.isShown {
+            closePopover(sender: sender)
+        } else {
+            showPopover(sender: sender)
         }
     }
 
-    func showPopover(sender: AnyObject?, keyword: String? = nil) {
+    func showPopover(sender: AnyObject?) {
         guard let button = statusItem.button else { return }
 
         NSApp.activate(ignoringOtherApps: true)
-
-        popover.behavior = .applicationDefined
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
 
         DispatchQueue.main.async {
-            guard let window = self.popover.contentViewController?.view.window else { return }
-
-            window.level = .normal
-            window.makeKeyAndOrderFront(nil)
-            window.orderFrontRegardless()
-
+            self.popover.contentViewController?.view.window?.orderFrontRegardless()
             self.translateViewController.focusInputIfPossible()
         }
 
@@ -119,9 +103,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                           error: AutoreleasingUnsafeMutablePointer<NSString?>) {
         guard let text = pasteboard.string(forType: .string) else { return }
 
-        NSLog("MenuTranslate: handling service invocation: " + text)
         translateViewController.loadText(text: text)
-        showPopover(sender: nil, keyword: text)
+        showPopover(sender: nil)
     }
 
     @IBAction
@@ -131,7 +114,6 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBAction
     func aboutMenuActivated(sender: AnyObject?) {
-        NSLog("MenuTranslate: opening github site")
         NSWorkspace.shared.open(URL(string: "https://github.com/zetxek/osx-menubar-translate")!)
     }
 }

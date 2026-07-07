@@ -27,23 +27,20 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
     @IBOutlet var webViewContainer: NSView!
     @IBOutlet var progressIndicator: NSProgressIndicator!
 
-    override var acceptsFirstResponder: Bool { false }
-
     var urlLoaded = false
+    private var pendingText: String?
     let defaultUrl = "https://translate.google.com?text="
 
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        NSLog("TranslateViewController: willAppear")
-        progressIndicator.isHidden = false
-        progressIndicator.startAnimation(nil)
-
         if !urlLoaded {
-            NSLog("TranslateViewController: loadURL")
             urlLoaded = true
+            progressIndicator.isHidden = false
+            progressIndicator.startAnimation(nil)
             webView.navigationDelegate = self
-            webView.load(URLRequest(url: URL(string: defaultUrl)!))
+            webView.load(getTranslateURL(textToTranslate: pendingText ?? ""))
+            pendingText = nil
         }
     }
 
@@ -53,19 +50,31 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
     }
 
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        NSLog("TranslateViewController: URL did finish")
-        progressIndicator.stopAnimation(nil)
-        progressIndicator.isHidden = true
+        hideProgress()
 
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.focusInputIfPossible()
         }
     }
 
-    public func loadText(text: String) {
-        NSLog("TranslateViewController: loading text: " + text)
+    func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        hideProgress()
+    }
 
-        guard webView != nil else { return }
+    func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        hideProgress()
+    }
+
+    private func hideProgress() {
+        progressIndicator.stopAnimation(nil)
+        progressIndicator.isHidden = true
+    }
+
+    public func loadText(text: String) {
+        guard isViewLoaded, webView != nil else {
+            pendingText = text
+            return
+        }
 
         progressIndicator.isHidden = false
         progressIndicator.startAnimation(nil)
@@ -83,11 +92,7 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
     }
 
     public func focusInputIfPossible() {
-        guard isViewLoaded else { return }
-        guard let window = view.window else {
-            NSLog("TranslateViewController: focusInputIfPossible skipped, window not ready")
-            return
-        }
+        guard isViewLoaded, let window = view.window else { return }
 
         window.level = .normal
         window.makeKeyAndOrderFront(nil)
@@ -127,17 +132,10 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
         })();
         """
 
-        webView.evaluateJavaScript(javascript) { result, error in
+        webView.evaluateJavaScript(javascript) { _, error in
             if let error = error {
                 NSLog("TranslateViewController: focusWebInputElement error: \(error.localizedDescription)")
-            } else {
-                NSLog("TranslateViewController: focusWebInputElement result: \(String(describing: result))")
             }
         }
-    }
-
-    public override func keyDown(with event: NSEvent) {
-        NSLog("TranslateViewController keyDown: " + (event.characters ?? ""))
-        super.keyDown(with: event)
     }
 }
