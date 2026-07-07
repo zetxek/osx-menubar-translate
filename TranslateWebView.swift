@@ -9,6 +9,11 @@
 import Cocoa
 import WebKit
 
+/// 自訂 WKWebView：攔截 cmd+C / cmd+V / cmd+A 並用 JS 橋接到網頁內。
+///
+/// 為什麼需要自己做：選單列 App（LSUIElement）沒有主選單（Edit menu），
+/// 系統的複製／貼上快捷鍵沒有選單項目可以路由，在 WebView 裡按了沒反應，
+/// 所以在 keyDown 攔下來，自己透過 JavaScript 對頁面執行對應操作。
 class TranslateWebView: WKWebView {
 
     override var acceptsFirstResponder: Bool { true }
@@ -21,6 +26,7 @@ class TranslateWebView: WKWebView {
         true
     }
 
+    /// 攔截 cmd+C / cmd+V / cmd+A，其餘按鍵（包含輸入法組字）交回 WebKit 原生處理。
     override func keyDown(with event: NSEvent) {
         let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
 
@@ -42,6 +48,7 @@ class TranslateWebView: WKWebView {
         }
     }
 
+    /// 全選：焦點在輸入框就選輸入框內容，否則選整頁。
     @IBAction override func selectAll(_ sender: Any?) {
         let javascript = """
         (function() {
@@ -67,6 +74,8 @@ class TranslateWebView: WKWebView {
         }
     }
 
+    /// 複製：用 JS 取出頁面目前選取的文字，寫進系統剪貼簿。
+    /// 輸入框（textarea）的選取要用 selectionStart/End 取，一般網頁文字用 getSelection()。
     @IBAction func copy(_ sender: Any?) {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
@@ -95,11 +104,14 @@ class TranslateWebView: WKWebView {
         }
     }
 
+    /// 貼上：把系統剪貼簿的文字插入頁面目前的輸入框。
     @IBAction func paste(_ sender: Any?) {
         let pasteboard = NSPasteboard.general
         guard let copiedString = pasteboard.string(forType: .string) else { return }
 
         // JSON-encode to get a valid JS string literal (handles quotes, backslashes, newlines)
+        // 用 JSON 編碼產生合法的 JS 字串常值——引號、反斜線、換行等所有邊界情況一次處理。
+        // 手工跳脫（舊做法）漏掉任何一種字元，注入的 JS 就直接語法錯誤、貼上整個失敗
         guard let data = try? JSONSerialization.data(withJSONObject: [copiedString]),
               let json = String(data: data, encoding: .utf8) else { return }
         let literal = String(json.dropFirst().dropLast())
