@@ -46,6 +46,9 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
         // 轉圈指示器也只在這裡開——每次顯示都開的話，沒有導航去關它，會永遠轉下去
         if !urlLoaded {
             urlLoaded = true
+            installDarkModeStyle()
+            // 載入期間的底色跟隨系統外觀，避免深色模式下開啟瞬間閃白底
+            webView.underPageBackgroundColor = .windowBackgroundColor
             progressIndicator.isHidden = false
             progressIndicator.startAnimation(nil)
             webView.navigationDelegate = self
@@ -109,6 +112,29 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
         let urlString = "\(defaultUrl)\(sanitizedInput)"
         let url = URL(string: urlString) ?? URL(string: defaultUrl)!
         return URLRequest(url: url)
+    }
+
+    /// 注入跟隨系統的深色模式樣式。Google 翻譯網頁版沒有深色主題（其
+    /// prefers-color-scheme 規則只管頂端帳號列圖示），所以用 CSS 濾鏡整頁反轉。
+    /// 包在 @media 查詢裡：WKWebView 會把 App 的外觀狀態傳給頁面，
+    /// 系統切換深淺色時頁面即時跟隨，不需要任何開關或重載。
+    /// 不依賴 Google 的 class 名稱（都是混淆過的），頁面改版不易失效。
+    private func installDarkModeStyle() {
+        let js = """
+        const style = document.createElement('style');
+        style.textContent = `
+        @media (prefers-color-scheme: dark) {
+          /* invert(0.88)：純白 -> #1f1f1f 柔和深灰、純黑文字 -> #e0e0e0，比 invert(1) 的死黑舒服。
+             背景宣告白色，經濾鏡反轉後才是深色（濾鏡會連 html 自己的背景一起反轉，
+             直接寫深色反而會被轉回淺色）。 */
+          html { filter: invert(0.88) hue-rotate(180deg); background: #fff; }
+          img, video, iframe { filter: invert(1) hue-rotate(180deg); }
+        }`;
+        document.documentElement.appendChild(style);
+        """
+        // atDocumentStart：頁面還沒開始繪製就掛上樣式，深色模式下不會先閃白再變暗
+        webView.configuration.userContentController.addUserScript(
+            WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: true))
     }
 
     /// 把鍵盤焦點交給網頁裡的翻譯輸入框（分兩層：先讓視窗成為 key window
