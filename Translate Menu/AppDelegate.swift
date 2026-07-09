@@ -70,6 +70,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.closePopover(sender: event)
         }
 
+        // 版本號從 Info.plist 動態帶入，不寫死在 xib（xib 裡的「Version」只是佔位字串）
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+        statusMenu.item(at: 0)?.title = "Version \(version)"
+
         // 註冊為「服務」提供者（對應 Info.plist 的 NSServices 宣告）
         NSApplication.shared.servicesProvider = self
     }
