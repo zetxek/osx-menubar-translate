@@ -27,19 +27,23 @@ class TranslateWebView: WKWebView {
     }
 
     /// 攔截 cmd+C / cmd+V / cmd+A，其餘按鍵（包含輸入法組字）交回 WebKit 原生處理。
+    /// 排除 capsLock 並把字元轉小寫比對——否則大寫鎖定開啟時三組快捷鍵全部失效。
     override func keyDown(with event: NSEvent) {
-        let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
+        let flags = event.modifierFlags
+            .intersection(.deviceIndependentFlagsMask)
+            .subtracting(.capsLock)
+        let key = event.charactersIgnoringModifiers?.lowercased()
 
         switch flags {
-        case [.command] where event.characters == "c":
+        case [.command] where key == "c":
             copy(nil)
             return
 
-        case [.command] where event.characters == "v":
+        case [.command] where key == "v":
             paste(nil)
             return
 
-        case [.command] where event.characters == "a":
+        case [.command] where key == "a":
             selectAll(nil)
             return
 
