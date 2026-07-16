@@ -21,28 +21,37 @@
 
 import Cocoa
 
+/// Thin wrapper around a global mouse event monitor.
+/// Used to detect clicks outside the popover so it can be dismissed automatically.
+///
+/// Note: NSEvent global monitors only receive events from *other* apps. Clicks on our
+/// own windows (the popover itself) don't fire it, so the popover can't dismiss itself.
 public class EventMonitor {
     private var monitor: AnyObject?
     private let mask: NSEvent.EventTypeMask
-    private let handler: (NSEvent?) -> ()
+    private let handler: (NSEvent?) -> Void
 
-    public init(mask: NSEvent.EventTypeMask, handler: @escaping (NSEvent?) -> ()) {
+    public init(mask: NSEvent.EventTypeMask, handler: @escaping (NSEvent?) -> Void) {
         self.mask = mask
         self.handler = handler
     }
 
     deinit {
-        self.stop()
+        stop()
     }
 
+    /// Starts monitoring. No-op if already running — registering twice would invoke
+    /// the handler once per registration.
     public func start() {
-        self.monitor = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: handler) as AnyObject?
+        guard monitor == nil else { return }
+        monitor = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: handler) as AnyObject?
     }
 
+    /// Stops monitoring and releases the monitor. Called when the popover closes so
+    /// no monitor lingers while unused.
     public func stop() {
-        if self.monitor != nil {
-            NSEvent.removeMonitor(self.monitor!)
-            self.monitor = nil
-        }
+        guard let monitor else { return }
+        NSEvent.removeMonitor(monitor)
+        self.monitor = nil
     }
 }

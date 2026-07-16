@@ -292,7 +292,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "info.adrianmoreno.Translate-Menu";
 				PRODUCT_NAME = "Translate Menu";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -322,7 +322,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
-				MARKETING_VERSION = 1.2.2;
+				MARKETING_VERSION = 1.2.3;
 				PRODUCT_BUNDLE_IDENTIFIER = "info.adrianmoreno.Translate-Menu";
 				PRODUCT_NAME = "Translate Menu";
 				PROVISIONING_PROFILE_SPECIFIER = "";

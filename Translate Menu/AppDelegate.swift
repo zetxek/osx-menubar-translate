@@ -21,97 +21,135 @@
 
 import Cocoa
 
+/// App entry point. Responsible for three things:
+/// 1. Creating the menu bar status item, handling left-click (toggle popover) and right-click (show menu)
+/// 2. Managing the translate popover's lifecycle (show, close, auto-close on outside click)
+/// 3. Registering the macOS Services menu entry so other apps can send selected text here to translate
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
+    /// Right-click menu (defined in MainMenu.xib; contains About and Quit)
     @IBOutlet weak var statusMenu: NSMenu!
-    
+
+    /// The status item in the menu bar
     var statusItem: NSStatusItem!
+    /// Popover window hosting the translate UI
     let popover = NSPopover()
+    /// Translate UI controller. Kept alive for the app's lifetime so the WebView stays
+    /// loaded and the popover opens instantly.
     let translateViewController = TranslateViewController(nibName: "TranslateViewController", bundle: nil)
+    /// Global mouse click monitor, used to detect clicks outside the popover and auto-close it
     var eventMonitor: EventMonitor?
-    
+
     func applicationDidFinishLaunching(_ notification: Notification) {
-        NSLog("MenuTranslate: starting")
-        self.statusItem = NSStatusBar.system.statusItem(withLength: 32)
-        
+        // Create the menu bar icon; isTemplate lets it adapt to light/dark menu bars automatically
+        statusItem = NSStatusBar.system.statusItem(withLength: 32)
+
         let image = NSImage(named: "TranslateStatusBarButtonImage")
         image?.isTemplate = true
-        
+
         if let button = statusItem.button {
             button.image = image
             button.action = #selector(statusItemButtonActivated(sender:))
-            
-            button.sendAction(on: [ .leftMouseDown, .leftMouseUp, .rightMouseDown, .rightMouseUp ])
+            // Fire on mouse-down only: also firing on mouseUp would run the action a second time per click
+            button.sendAction(on: [.leftMouseDown, .rightMouseDown])
         }
-        
-        popover.contentViewController = translateViewController
-        
-        eventMonitor = EventMonitor(mask: [.leftMouseDown, .rightMouseDown]) { [unowned self] event in
-            if self.popover.isShown {
-                self.closePopover(sender: event)
-            }
-        }
-        
-        eventMonitor?.start()
-        
-        NSApplication.shared.servicesProvider = self
-        NSLog("MenuTranslate: started")
 
+        popover.contentViewController = translateViewController
+        // Dismissal is controlled entirely in code (not .transient), so system windows such as
+        // IME candidate lists stealing focus don't close it
+        popover.behavior = .applicationDefined
+
+        // Global monitors only see clicks from other processes. Decide by whether the mouse
+        // location falls inside the popover's frame rather than by window identity: IME
+        // candidate windows belong to the input-method process and overlap the popover, and
+        // clicking a candidate must not dismiss it.
+        eventMonitor = EventMonitor(mask: [.leftMouseDown, .rightMouseDown]) { [unowned self] event in
+            guard self.popover.isShown,
+                  let frame = self.popover.contentViewController?.view.window?.frame,
+                  !NSMouseInRect(NSEvent.mouseLocation, frame, false)
+            else { return }
+
+            self.closePopover(sender: event)
+        }
+
+        // Version is read from Info.plist at runtime rather than hardcoded in the xib
+        // (the xib's "Version" title is just a placeholder)
+        let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
+        statusMenu.item(at: 0)?.title = "Version \(version)"
+
+        // Register as a Services provider (matches the NSServices declaration in Info.plist)
+        NSApplication.shared.servicesProvider = self
     }
-    
+
+    /// Status item clicked: left-click toggles the popover, right-click (or control+left-click) shows the menu.
     @IBAction
     func statusItemButtonActivated(sender: AnyObject?) {
-        let buttonMask = NSEvent.pressedMouseButtons
-        var primaryDown = ((buttonMask & (1 << 0)) != 0)
-        var secondaryDown = ((buttonMask & (1 << 1)) != 0)
-        
-        // Treat a control-click as a secondary click
-        if (primaryDown && (NSEvent.modifierFlags == NSEvent.ModifierFlags.control)) {
-            primaryDown = false;
-            secondaryDown = true;
-        }
-        
-        if (primaryDown) {
-            if popover.isShown {
-                closePopover(sender: sender)
-            } else {
-                showPopover(sender: sender)
-            }
-        } else if (secondaryDown) {
+        // Decide from the triggering event, not live mouse state: when the main thread is busy
+        // the action runs late, by which point the button is already released. Reading live
+        // state then misses the click entirely — the root cause of the old "sometimes needs
+        // two clicks" bug.
+        let event = NSApp.currentEvent
+        let isSecondary = event?.type == .rightMouseDown
+            || event?.modifierFlags.contains(.control) == true
+
+        if isSecondary {
+            // Temporarily attaching the menu then simulating a click is the standard way to make
+            // NSStatusItem show a menu. Detach it immediately after, or subsequent left-clicks
+            // would open the menu instead of the popover.
             statusItem.menu = self.statusMenu
             statusItem.button?.performClick(nil)
             statusItem.menu = nil
+        } else if popover.isShown {
+            closePopover(sender: sender)
+        } else {
+            showPopover(sender: sender)
         }
     }
-    
-    func showPopover(sender: AnyObject?, keyword : String? = nil) {
-        if let button = statusItem.button {
-            popover.show(relativeTo: button.bounds, of: button, preferredEdge: NSRectEdge.minY)
+
+    /// Shows the popover and hands keyboard focus to the translate input field.
+    func showPopover(sender: AnyObject?) {
+        guard let button = statusItem.button else { return }
+
+        // A menu bar app isn't normally the active app; it must activate explicitly to receive keyboard input
+        NSApp.activate(ignoringOtherApps: true)
+        popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
+
+        // The popover's window doesn't exist until the runloop turn after show(), so defer focus by one hop
+        DispatchQueue.main.async {
+            self.popover.contentViewController?.view.window?.orderFrontRegardless()
+            self.translateViewController.focusInputIfPossible()
         }
+
         eventMonitor?.start()
     }
-    
+
+    /// Closes the popover and stops the global click monitor (no monitor lingers while unused).
     func closePopover(sender: AnyObject?) {
         popover.performClose(sender)
         eventMonitor?.stop()
     }
-    
-    @objc func translateService(_ pasteboard: NSPasteboard, userData: String, error: AutoreleasingUnsafeMutablePointer<NSString?>) {
-        let text = pasteboard.string(forType: .string)
-        NSLog("MenuTranslate: handling service invocation: " + text!)
-        translateViewController.loadText(text: text!)
-        self.showPopover(sender: nil, keyword: text)
+
+    /// macOS Services menu entry point: text selected in another app → "Translate in MenuTranslate" → here.
+    /// The system passes the selected text in via the pasteboard.
+    @objc
+    func translateService(_ pasteboard: NSPasteboard,
+                          userData: String,
+                          error: AutoreleasingUnsafeMutablePointer<NSString?>) {
+        guard let text = pasteboard.string(forType: .string) else { return }
+
+        translateViewController.loadText(text: text)
+        showPopover(sender: nil)
     }
-    
-    @IBAction func quitApp(_ sender: Any) {
+
+    /// Right-click menu: Quit.
+    @IBAction
+    func quitApp(_ sender: Any) {
         NSApplication.shared.terminate(self)
     }
-    
-    
+
+    /// Right-click menu: About — opens the project's GitHub page.
     @IBAction
     func aboutMenuActivated(sender: AnyObject?) {
-        NSLog("MenuTranslate: opening github site")
-        NSWorkspace().open(URL(string: "https://github.com/zetxek/osx-menubar-translate")!)
+        NSWorkspace.shared.open(URL(string: "https://github.com/zetxek/osx-menubar-translate")!)
     }
-    
 }
