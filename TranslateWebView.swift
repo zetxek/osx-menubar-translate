@@ -9,11 +9,11 @@
 import Cocoa
 import WebKit
 
-/// 自訂 WKWebView：攔截 cmd+C / cmd+V / cmd+A 並用 JS 橋接到網頁內。
+/// Custom WKWebView that intercepts cmd+C / cmd+V / cmd+A and bridges them into the page via JS.
 ///
-/// 為什麼需要自己做：選單列 App（LSUIElement）沒有主選單（Edit menu），
-/// 系統的複製／貼上快捷鍵沒有選單項目可以路由，在 WebView 裡按了沒反應，
-/// 所以在 keyDown 攔下來，自己透過 JavaScript 對頁面執行對應操作。
+/// Why this is needed: a menu bar app (LSUIElement) has no main menu, so there is no Edit
+/// menu for the system copy/paste shortcuts to route through — pressing them in the WebView
+/// does nothing. Intercept them in keyDown and perform the equivalent operation via JavaScript.
 class TranslateWebView: WKWebView {
 
     override var acceptsFirstResponder: Bool { true }
@@ -26,8 +26,10 @@ class TranslateWebView: WKWebView {
         true
     }
 
-    /// 攔截 cmd+C / cmd+V / cmd+A，其餘按鍵（包含輸入法組字）交回 WebKit 原生處理。
-    /// 排除 capsLock 並把字元轉小寫比對——否則大寫鎖定開啟時三組快捷鍵全部失效。
+    /// Intercepts cmd+C / cmd+V / cmd+A; every other key (including IME composition)
+    /// falls through to WebKit's native handling.
+    /// Subtracts capsLock and lowercases the character before matching — otherwise all
+    /// three shortcuts break while Caps Lock is on.
     override func keyDown(with event: NSEvent) {
         let flags = event.modifierFlags
             .intersection(.deviceIndependentFlagsMask)
@@ -52,7 +54,7 @@ class TranslateWebView: WKWebView {
         }
     }
 
-    /// 全選：焦點在輸入框就選輸入框內容，否則選整頁。
+    /// Select all: selects the focused input's contents if there is one, otherwise the whole page.
     @IBAction override func selectAll(_ sender: Any?) {
         let javascript = """
         (function() {
@@ -78,8 +80,8 @@ class TranslateWebView: WKWebView {
         }
     }
 
-    /// 複製：用 JS 取出頁面目前選取的文字，寫進系統剪貼簿。
-    /// 輸入框（textarea）的選取要用 selectionStart/End 取，一般網頁文字用 getSelection()。
+    /// Copy: reads the page's current selection via JS and writes it to the system pasteboard.
+    /// Input fields (textarea) need selectionStart/End; ordinary page text uses getSelection().
     @IBAction func copy(_ sender: Any?) {
         let pasteboard = NSPasteboard.general
         pasteboard.clearContents()
@@ -108,14 +110,14 @@ class TranslateWebView: WKWebView {
         }
     }
 
-    /// 貼上：把系統剪貼簿的文字插入頁面目前的輸入框。
+    /// Paste: inserts the system pasteboard's text into the page's currently focused input.
     @IBAction func paste(_ sender: Any?) {
         let pasteboard = NSPasteboard.general
         guard let copiedString = pasteboard.string(forType: .string) else { return }
 
-        // JSON-encode to get a valid JS string literal (handles quotes, backslashes, newlines)
-        // 用 JSON 編碼產生合法的 JS 字串常值——引號、反斜線、換行等所有邊界情況一次處理。
-        // 手工跳脫（舊做法）漏掉任何一種字元，注入的 JS 就直接語法錯誤、貼上整個失敗
+        // JSON-encode to get a valid JS string literal — handles quotes, backslashes and
+        // newlines in one shot. The old hand-rolled escaping missed cases, which made the
+        // injected JS a syntax error and silently broke paste entirely.
         guard let data = try? JSONSerialization.data(withJSONObject: [copiedString]),
               let json = String(data: data, encoding: .utf8) else { return }
         let literal = String(json.dropFirst().dropLast())
