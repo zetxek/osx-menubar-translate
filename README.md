@@ -1,72 +1,75 @@
 # MenuBar Translate
 
-macOS 選單列翻譯工具：把 Google 翻譯常駐在選單列，點一下圖示立即翻譯，不必另開瀏覽器。支援深色模式，並整合 macOS「服務」選單——在任何 App 選取文字，右鍵即可送進來翻譯。
+MenuBar Translate keeps Google Translate in your macOS menu bar: click the icon and translate instantly, without opening a browser window. It supports dark mode and integrates with the macOS "Services" menu, so you can select text in any app and send it straight here.
 
-> Fork 自 [zetxek/osx-menubar-translate](https://github.com/zetxek/osx-menubar-translate)（MIT 授權），此版本包含多項穩定性修正與深色模式。
+One click, and you're ready to translate.
 
 ![](Docs/service-demo.gif)
 
-## 下載安裝
+You can open the application from your menubar, as well as from the macOS contextual service ("Services > Translate in MenuTranslate"):
 
-1. 到 [Releases](https://github.com/shuwn/osx-menubar-translate/releases) 下載最新版 zip
-2. 解壓縮，把 `Translate Menu.app` 拖進「應用程式」資料夾
-3. 打開即可——翻譯圖示出現在選單列
+![2024-11-19 21 32 57](https://github.com/user-attachments/assets/433a4b0c-2f0d-4782-926c-1f7b8c5ace09)
 
-釋出版本**已通過 Apple 公證（Notarized）**，下載後直接打開，不會出現 Gatekeeper 警告。
+## Download
 
-系統需求：macOS 12.4+（Apple Silicon）。
+Get the latest binary from [the releases section](https://github.com/zetxek/osx-menubar-translate/releases).
+Unzip the file and drag & drop it into the Applications folder. Ready!
 
-## 功能
+Requirements: macOS 12.4+.
 
-- **點一下就翻譯**：WebView 常駐記憶體，開啟視窗零載入等待
-- **深色模式**：跟隨系統外觀即時切換。Google 翻譯網頁版本身沒有深色主題，本版以 CSS 濾鏡實作柔和深灰配色，切換時不需重載
-- **服務選單整合**：任何 App 選取文字 → 右鍵 → 服務 → Translate in MenuTranslate
-- **右鍵選單**：版本資訊（自動同步 Info.plist）、關於、結束
-- **無追蹤**：App 本身不收集任何資料（內嵌網頁中 Google 自己的行為除外）
-- **沙盒化**：App Sandbox 啟用，僅申請對外網路連線權限
+## Features
 
-## 快捷鍵
+- **One click to translate**: the WebView stays resident in memory, so the window opens with no load wait
+- **Dark mode**: follows the system appearance and switches live. Google Translate's web version has no dark theme of its own, so this app implements a soft dark grey via a CSS filter — no reload needed when you switch
+- **Services menu integration**: select text in any app → right-click → Services → Translate in MenuTranslate
+- **Right-click menu**: version info (read from Info.plist), About, Quit
+- **No tracking at all**: well, except the tracking Google does on the Translate instance loaded in the embedded WebView — but nothing by me
+- **Sandboxed**: App Sandbox enabled, requesting only outbound network access
 
-翻譯視窗內支援（Caps Lock 開啟時也正常運作）：
+Code-wise it might also serve you as a blueprint for embedding a WebView with a service that receives text from other contexts.
 
-| 快捷鍵 | 功能 |
+## Supported key shortcuts
+
+Available inside the translate window (and while Caps Lock is on):
+
+| Shortcut | Action |
 |---|---|
-| `cmd + A` | 全選 |
-| `cmd + C` | 複製 |
-| `cmd + V` | 貼上 |
+| `cmd + a` | **select all** |
+| `cmd + c` | **copy** |
+| `cmd + v` | **paste** |
 
-選單列 App 沒有編輯選單可路由快捷鍵，這三組由 App 攔截鍵盤事件、透過 JavaScript 橋接到網頁內實作。
+A menu bar app has no Edit menu for these to route through, so the app intercepts the key events and bridges them into the page via JavaScript.
 
-## 架構
+## Architecture
 
-~450 行 Swift，四個檔案，全繁體中文註解：
+~450 lines of Swift across four files:
 
 ```
-使用者動線（三個入口，匯流到同一條路徑）
-┌─ 選單列圖示左鍵 ──┐
-├─ 右鍵選單         ─┼─▶ AppDelegate ──▶ TranslateViewController
-└─ 系統「服務」選單 ─┘        │                   │
-                        EventMonitor         WKWebView（Google 翻譯）
-                       （點外部自動關閉）      TranslateWebView
-                                            （cmd+C/V/A ↔ JS 橋接）
+User entry points (three, converging on one path)
+┌─ Menu bar icon, left click ─┐
+├─ Right-click menu           ─┼─▶ AppDelegate ──▶ TranslateViewController
+└─ System "Services" menu     ─┘        │                   │
+                                  EventMonitor        WKWebView (Google Translate)
+                              (closes on outside click)  TranslateWebView
+                                                       (cmd+C/V/A ↔ JS bridge)
 ```
 
-| 檔案 | 職責 |
+| File | Responsibility |
 |---|---|
-| `AppDelegate.swift` | 入口分派、popover 生命週期、服務註冊、版本選單 |
-| `TranslateViewController.swift` | WebView 宿主、翻譯網址編碼、深色模式注入、焦點管理 |
-| `TranslateWebView.swift` | 鍵盤攔截、剪貼簿與網頁間的 JS 橋接 |
-| `EventMonitor.swift` | 全域點擊監聽（偵測點擊 popover 外部） |
+| `AppDelegate.swift` | Entry dispatch, popover lifecycle, Services registration, version menu |
+| `TranslateViewController.swift` | WebView host, translate URL encoding, dark mode injection, focus management |
+| `TranslateWebView.swift` | Keyboard interception, JS bridge between the pasteboard and the page |
+| `EventMonitor.swift` | Global click monitor (detects clicks outside the popover) |
 
-## 自行建置
+## Building it yourself
 
 ```bash
-git clone https://github.com/shuwn/osx-menubar-translate.git
+git clone https://github.com/zetxek/osx-menubar-translate.git
 cd osx-menubar-translate
-open "Translate Menu.xcodeproj"   # Xcode 直接 Run
+open "Translate Menu.xcodeproj"   # Run straight from Xcode
 ```
 
-或用命令列（ad-hoc 簽章）：
+Or from the command line (ad-hoc signing):
 
 ```bash
 xcodebuild -project "Translate Menu.xcodeproj" -scheme "Translate Menu" \
@@ -75,43 +78,33 @@ xcodebuild -project "Translate Menu.xcodeproj" -scheme "Translate Menu" \
   DEVELOPMENT_TEAM="" PROVISIONING_PROFILE_SPECIFIER=""
 ```
 
-### 釋出流程（維護者用）
+## Fixes in this release
 
-Developer ID 建置 → Apple 公證 → staple → GitHub Release：
+- Fixed pasting text containing quotes, backslashes or newlines (hand-rolled JS escaping replaced with JSON encoding)
+- Fixed text being dropped on the first Services-menu translation after a cold start
+- Fixed the menu bar icon sometimes needing two clicks (click detection now uses the triggering event instead of live mouse state)
+- Fixed the window closing when clicking IME candidates while typing Chinese (outside-click detection now uses mouse coordinates)
+- Fixed cmd+C/V/A breaking while Caps Lock is on
+- Fixed the loading spinner spinning forever on reopen or when the network drops
+- Fixed the menu version number being hardcoded in the xib and drifting from the real version
+- Added dark mode, and a white-flash guard while loading
 
-```bash
-xcodebuild -scheme "Translate Menu" -configuration Release build \
-  CODE_SIGN_IDENTITY="Developer ID Application" ENABLE_HARDENED_RUNTIME=YES \
-  CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO OTHER_CODE_SIGN_FLAGS="--timestamp" \
-  CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM=<TEAM_ID> PROVISIONING_PROFILE_SPECIFIER=""
-ditto -c -k --keepParent "Translate Menu.app" app.zip
-xcrun notarytool submit app.zip --keychain-profile notary --wait
-xcrun stapler staple "Translate Menu.app"
-```
+## Contributing
 
-## 相對上游的修正
+The project just solves a personal need I have: I am Spanish and live abroad (first in The Netherlands, now in Denmark), so often I need to translate texts or words I don't know yet.
 
-皆經實機驗證與 50+ 輪壓力測試（零崩潰、零記憶體洩漏、閒置 CPU 0%）：
+If this project is useful for you and you would like to get it improved, feel free to [create an issue](https://github.com/zetxek/osx-menubar-translate/issues), or [open a PR](https://github.com/zetxek/osx-menubar-translate/pulls) straight away. It will be more than welcome!
 
-- 修正貼上含引號／反斜線／換行的文字會失敗（手工 JS 跳脫改為 JSON 編碼）
-- 修正冷啟動後第一次透過服務選單翻譯時文字遺失
-- 修正選單列圖示有時要點兩次才有反應（點擊判斷改用觸發事件，不讀滑鼠即時狀態）
-- 修正打中文點輸入法候選字時視窗被誤關（外部點擊判斷改用滑鼠座標）
-- 修正 Caps Lock 開啟時 cmd+C/V/A 失效
-- 修正載入指示器在重開視窗或斷網時永遠轉圈
-- 修正選單版本號寫死在 xib、與實際版本脫鉤
-- 新增深色模式與載入防白閃
+## Screenshots
 
-## 截圖
-
-選單列圖示：
+The icon in the menu bar:
 
 ![](Resources/closed.png)
 
-翻譯視窗展開：
+The embedded window open:
 
 ![](Resources/open.png)
 
-## 授權
+## License
 
-MIT License，詳見 [license.md](license.md)。原作者：[Adrián Moreno Peña](https://github.com/zetxek)。
+MIT License, available in [license.md](license.md).
