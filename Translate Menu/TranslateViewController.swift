@@ -61,6 +61,29 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
         super.viewDidAppear()
         // 每次 popover 顯示都重新把焦點放進輸入框，使用者可以直接打字
         focusInputIfPossible()
+        retranslateIfNeeded()
+    }
+
+    /// 救回卡在「…」的翻譯：popover 關閉時行程休眠（或 Google 後端偶發丟棄）
+    /// 會殺死飛行中的翻譯請求，而 Google 頁面沒有重試機制、會永遠等下去。
+    /// 每次重開 popover 對輸入框補發一個 input 事件，強制頁面重發翻譯請求；
+    /// 輸入框是空的就什麼都不做。
+    private func retranslateIfNeeded() {
+        let js = """
+        (function() {
+            const t = document.querySelector('textarea');
+            if (t && t.value) {
+                t.dispatchEvent(new Event('input', {bubbles: true}));
+                return 'retranslated';
+            }
+            return 'empty';
+        })();
+        """
+        webView.evaluateJavaScript(js) { _, error in
+            if let error = error {
+                NSLog("TranslateViewController: retranslateIfNeeded error: \(error.localizedDescription)")
+            }
+        }
     }
 
     /// 頁面載入完成：收轉圈、把焦點放進輸入框。
