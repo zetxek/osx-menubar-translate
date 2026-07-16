@@ -16,12 +16,25 @@
 		0C660F7BC3B445480E693D12 /* HotKeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA311E6C91A796D25B41C5AE /* HotKeyCenter.swift */; };
 		15BA783BB0F7C25D1A25CC5F /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3455DA34E0783A9FE5E372F8 /* SettingsWindowController.swift */; };
 		5077E61A2CEA791500EFBF1B /* TranslateWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077E6192CEA791500EFBF1B /* TranslateWebView.swift */; };
+		6F814C345FFE89CECEE73347 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 182AC6B3CA0EEFCD8EB7D9E3 /* Cocoa.framework */; };
 		90CBC726DE69E6FCEF510C9E /* ShortcutRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169A7A70292E08096E5B0C30 /* ShortcutRecorderView.swift */; };
 		A52AB4D43D4F4566A8EFDBD0 /* GlobalShortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20929A7335927D0F6F1C42A1 /* GlobalShortcut.swift */; };
 		E7DE0D3B2344A24C00A9CBAD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = E7DE0D3A2344A24C00A9CBAD /* MainMenu.xib */; };
+		FC32F2806B452F8026449579 /* GlobalShortcutTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 054AE720EF7A4AABBCC1B727 /* GlobalShortcutTests.swift */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		B2297D24076D8742426A0D75 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 78A6BBC31ADCB5EE00554D13 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 78A6BBCA1ADCB5EE00554D13;
+			remoteInfo = "Translate Menu";
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		054AE720EF7A4AABBCC1B727 /* GlobalShortcutTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GlobalShortcutTests.swift; path = "Translate MenuTests/GlobalShortcutTests.swift"; sourceTree = SOURCE_ROOT; };
 		0AC0CE141C81AEEF00305ACF /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = "Translate Menu/AppDelegate.swift"; sourceTree = SOURCE_ROOT; };
 		0AC0CE151C81AEEF00305ACF /* EventMonitor.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EventMonitor.swift; path = "Translate Menu/EventMonitor.swift"; sourceTree = SOURCE_ROOT; };
 		0AC0CE171C81AEEF00305ACF /* TranslateViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TranslateViewController.swift; path = "Translate Menu/TranslateViewController.swift"; sourceTree = SOURCE_ROOT; };
@@ -29,6 +42,8 @@
 		0AC0CE1E1C81AEF700305ACF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Translate Menu/Images.xcassets"; sourceTree = SOURCE_ROOT; };
 		0AC0CE261C81B02B00305ACF /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		169A7A70292E08096E5B0C30 /* ShortcutRecorderView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ShortcutRecorderView.swift; path = "Translate Menu/ShortcutRecorderView.swift"; sourceTree = SOURCE_ROOT; };
+		182AC6B3CA0EEFCD8EB7D9E3 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
+		1C702E9D9F89868E3D4CD62C /* Translate MenuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Translate MenuTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		20929A7335927D0F6F1C42A1 /* GlobalShortcut.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GlobalShortcut.swift; path = "Translate Menu/GlobalShortcut.swift"; sourceTree = SOURCE_ROOT; };
 		3455DA34E0783A9FE5E372F8 /* SettingsWindowController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsWindowController.swift; path = "Translate Menu/SettingsWindowController.swift"; sourceTree = SOURCE_ROOT; };
 		5077E6192CEA791500EFBF1B /* TranslateWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateWebView.swift; sourceTree = SOURCE_ROOT; };
@@ -40,6 +55,14 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		442AA202976310C59C642321 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				6F814C345FFE89CECEE73347 /* Cocoa.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		78A6BBC81ADCB5EE00554D13 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -51,12 +74,30 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2F0CFD79733E42A7011B0893 /* Translate MenuTests */ = {
+			isa = PBXGroup;
+			children = (
+				054AE720EF7A4AABBCC1B727 /* GlobalShortcutTests.swift */,
+			);
+			name = "Translate MenuTests";
+			sourceTree = "<group>";
+		};
+		602D0B6C2B051EEC50E7C9DE /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				D33A3F6C6DD5E131AF1D62B1 /* OS X */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		78A6BBC21ADCB5EE00554D13 = {
 			isa = PBXGroup;
 			children = (
 				0AC0CE261C81B02B00305ACF /* WebKit.framework */,
 				78A6BBCD1ADCB5EE00554D13 /* Translate Menu */,
 				78A6BBCC1ADCB5EE00554D13 /* Products */,
+				602D0B6C2B051EEC50E7C9DE /* Frameworks */,
+				2F0CFD79733E42A7011B0893 /* Translate MenuTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -64,6 +105,7 @@
 			isa = PBXGroup;
 			children = (
 				78A6BBCB1ADCB5EE00554D13 /* Translate Menu.app */,
+				1C702E9D9F89868E3D4CD62C /* Translate MenuTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -89,9 +131,35 @@
 			path = Quotes;
 			sourceTree = "<group>";
 		};
+		D33A3F6C6DD5E131AF1D62B1 /* OS X */ = {
+			isa = PBXGroup;
+			children = (
+				182AC6B3CA0EEFCD8EB7D9E3 /* Cocoa.framework */,
+			);
+			name = "OS X";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		12FEFCD23341F9B27D5CA006 /* Translate MenuTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 15CD5BBF22B184B9C570BDC5 /* Build configuration list for PBXNativeTarget "Translate MenuTests" */;
+			buildPhases = (
+				89BEC53BEA1E9E3F71F5E3AA /* Sources */,
+				442AA202976310C59C642321 /* Frameworks */,
+				A1DC4BF88B1B193E9BEEF7B6 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				362FFDAB63F727E43EC622B8 /* PBXTargetDependency */,
+			);
+			name = "Translate MenuTests";
+			productName = "Translate MenuTests";
+			productReference = 1C702E9D9F89868E3D4CD62C /* Translate MenuTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		78A6BBCA1ADCB5EE00554D13 /* Translate Menu */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 78A6BBE51ADCB5EE00554D13 /* Build configuration list for PBXNativeTarget "Translate Menu" */;
@@ -140,6 +208,7 @@
 			projectRoot = "";
 			targets = (
 				78A6BBCA1ADCB5EE00554D13 /* Translate Menu */,
+				12FEFCD23341F9B27D5CA006 /* Translate MenuTests */,
 			);
 		};
 /* End PBXProject section */
@@ -152,6 +221,13 @@
 				0AC0CE1D1C81AEEF00305ACF /* TranslateViewController.xib in Resources */,
 				0AC0CE1F1C81AEF700305ACF /* Images.xcassets in Resources */,
 				E7DE0D3B2344A24C00A9CBAD /* MainMenu.xib in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A1DC4BF88B1B193E9BEEF7B6 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -173,9 +249,45 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		89BEC53BEA1E9E3F71F5E3AA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				FC32F2806B452F8026449579 /* GlobalShortcutTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		362FFDAB63F727E43EC622B8 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = "Translate Menu";
+			target = 78A6BBCA1ADCB5EE00554D13 /* Translate Menu */;
+			targetProxy = B2297D24076D8742426A0D75 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		3AD3843FCFC1F05A9E220D76 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "info.adrianmoreno.Translate-MenuTests";
+				PRODUCT_MODULE_NAME = Translate_MenuTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Translate Menu.app/Contents/MacOS/Translate Menu";
+			};
+			name = Release;
+		};
 		78A6BBE31ADCB5EE00554D13 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -347,9 +459,37 @@
 			};
 			name = Release;
 		};
+		830862A41A7217DDB4620BF8 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_IDENTITY = "-";
+				CODE_SIGN_STYLE = Manual;
+				DEVELOPMENT_TEAM = "";
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 12.4;
+				PRODUCT_BUNDLE_IDENTIFIER = "info.adrianmoreno.Translate-MenuTests";
+				PRODUCT_MODULE_NAME = Translate_MenuTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				SDKROOT = macosx;
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Translate Menu.app/Contents/MacOS/Translate Menu";
+			};
+			name = Debug;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		15CD5BBF22B184B9C570BDC5 /* Build configuration list for PBXNativeTarget "Translate MenuTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3AD3843FCFC1F05A9E220D76 /* Release */,
+				830862A41A7217DDB4620BF8 /* Debug */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		78A6BBC61ADCB5EE00554D13 /* Build configuration list for PBXProject "Translate Menu" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

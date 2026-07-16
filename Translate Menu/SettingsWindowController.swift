@@ -138,11 +138,22 @@ final class SettingsWindowController: NSWindowController {
         }
     }
 
-    /// Shows the window and brings it forward. A menu bar app isn't the active app, so it
-    /// has to activate explicitly or the window opens behind whatever the user was using.
+    /// Shows the window and brings it forward.
+    ///
+    /// Getting this in front is fiddlier than it looks. A menu bar app is not the active
+    /// app, so the window opens behind whatever the user was in unless we activate first —
+    /// and `activate(ignoringOtherApps:)` has had no effect since macOS 14, so relying on
+    /// it alone means the window opens invisibly behind the browser. Hence all three:
+    /// the modern activate on 14+, the old one below it, and orderFrontRegardless() to
+    /// force the window up even if activation is refused (which is what the popover does).
     func present() {
-        NSApp.activate(ignoringOtherApps: true)
+        if #available(macOS 14.0, *) {
+            NSApp.activate()
+        } else {
+            NSApp.activate(ignoringOtherApps: true)
+        }
         showWindow(nil)
         window?.makeKeyAndOrderFront(nil)
+        window?.orderFrontRegardless()
     }
 }
