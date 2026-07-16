@@ -22,7 +22,8 @@ Requirements: macOS 12.4+.
 - **One click to translate**: the WebView stays resident in memory, so the window opens with no load wait
 - **Dark mode**: follows the system appearance and switches live. Google Translate's web version has no dark theme of its own, so this app implements a soft dark grey via a CSS filter — no reload needed when you switch
 - **Services menu integration**: select text in any app → right-click → Services → Translate in MenuTranslate
-- **Right-click menu**: version info (read from Info.plist), About, Quit
+- **Right-click menu**: version info (read from Info.plist), Start at Login, About, Quit
+- **Start at Login**: toggle it from the right-click menu (macOS 13+). On macOS 12 the item is hidden — add the app to Login Items in System Settings by hand instead
 - **No tracking at all**: well, except the tracking Google does on the Translate instance loaded in the embedded WebView — but nothing by me
 - **Sandboxed**: App Sandbox enabled, requesting outbound network access — plus a read-only user-selected-files entitlement that the project's build settings add and nothing in the app currently uses
 

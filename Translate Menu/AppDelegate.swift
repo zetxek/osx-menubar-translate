@@ -20,6 +20,7 @@
 */
 
 import Cocoa
+import ServiceManagement
 
 /// App entry point. Responsible for three things:
 /// 1. Creating the menu bar status item, handling left-click (toggle popover) and right-click (show menu)
@@ -29,6 +30,10 @@ import Cocoa
 class AppDelegate: NSObject, NSApplicationDelegate {
     /// Right-click menu (defined in MainMenu.xib; contains About and Quit)
     @IBOutlet weak var statusMenu: NSMenu!
+
+    /// "Start at Login" toggle. Added in code rather than the xib because it only
+    /// exists on macOS 13+, where SMAppService is available.
+    private var startAtLoginItem: NSMenuItem?
 
     /// The status item in the menu bar
     var statusItem: NSStatusItem!
@@ -76,6 +81,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // (the xib's "Version" title is just a placeholder)
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
         statusMenu.item(at: 0)?.title = "Version \(version)"
+
+        installStartAtLoginItem()
 
         // Register as a Services provider (matches the NSServices declaration in Info.plist)
         NSApplication.shared.servicesProvider = self
@@ -141,6 +148,68 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         showPopover(sender: nil)
     }
 
+    /// Adds the "Start at Login" toggle to the right-click menu, just under the version.
+    /// Does nothing before macOS 13: SMAppService doesn't exist there, and the app still
+    /// deploys back to 12.4. Users on 12.x can add the app to Login Items in System
+    /// Settings by hand, which is what this automates.
+    private func installStartAtLoginItem() {
+        guard #available(macOS 13.0, *) else { return }
+
+        let item = NSMenuItem(title: "Start at Login",
+                              action: #selector(toggleStartAtLogin(_:)),
+                              keyEquivalent: "")
+        item.target = self
+        statusMenu.insertItem(item, at: 1)
+        startAtLoginItem = item
+
+        // The state can change outside the app (System Settings > General > Login Items),
+        // so refresh it each time the menu opens rather than trusting a cached value.
+        statusMenu.delegate = self
+    }
+
+    /// Registers or unregisters the app as a login item.
+    ///
+    /// SMAppService replaces the old login-item helper-bundle dance, and works for any
+    /// signed app — App Store distribution is not required, contrary to what this
+    /// project previously assumed.
+    @available(macOS 13.0, *)
+    @objc
+    private func toggleStartAtLogin(_ sender: NSMenuItem) {
+        let service = SMAppService.mainApp
+        do {
+            if service.status == .enabled {
+                try service.unregister()
+            } else {
+                try service.register()
+            }
+        } catch {
+            NSLog("AppDelegate: could not toggle start at login: \(error.localizedDescription)")
+        }
+        refreshStartAtLoginItem()
+    }
+
+    /// Mirrors the real SMAppService state onto the menu item.
+    private func refreshStartAtLoginItem() {
+        guard #available(macOS 13.0, *), let item = startAtLoginItem else { return }
+
+        switch SMAppService.mainApp.status {
+        case .enabled:
+            item.state = .on
+            item.title = "Start at Login"
+            item.isEnabled = true
+        case .requiresApproval:
+            // The user has to allow it in System Settings; the app cannot do it for them.
+            // Say so, rather than showing an unticked box that appears to do nothing.
+            item.state = .off
+            item.title = "Start at Login (allow in System Settings)"
+            item.isEnabled = true
+        default:
+            item.state = .off
+            item.title = "Start at Login"
+            item.isEnabled = true
+        }
+    }
+
     /// Right-click menu: Quit.
     @IBAction
     func quitApp(_ sender: Any) {
@@ -151,5 +220,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction
     func aboutMenuActivated(sender: AnyObject?) {
         NSWorkspace.shared.open(URL(string: "https://github.com/zetxek/osx-menubar-translate")!)
+    }
+}
+
+extension AppDelegate: NSMenuDelegate {
+    /// The login-item state lives in System Settings and can change behind our back,
+    /// so re-read it every time the menu is about to be shown.
+    func menuWillOpen(_ menu: NSMenu) {
+        refreshStartAtLoginItem()
     }
 }
