@@ -82,10 +82,9 @@ class TranslateWebView: WKWebView {
 
     /// Copy: reads the page's current selection via JS and writes it to the system pasteboard.
     /// Input fields (textarea) need selectionStart/End; ordinary page text uses getSelection().
+    /// The pasteboard is only cleared once there is text to replace it with — clearing up
+    /// front would destroy the user's clipboard whenever the JS fails or nothing is selected.
     @IBAction func copy(_ sender: Any?) {
-        let pasteboard = NSPasteboard.general
-        pasteboard.clearContents()
-
         let script = """
         (function() {
             const active = document.activeElement;
@@ -104,9 +103,11 @@ class TranslateWebView: WKWebView {
                 return
             }
 
-            if let selectedText = selectedText as? String {
-                pasteboard.setString(selectedText, forType: .string)
-            }
+            guard let selectedText = selectedText as? String, !selectedText.isEmpty else { return }
+
+            let pasteboard = NSPasteboard.general
+            pasteboard.clearContents()
+            pasteboard.setString(selectedText, forType: .string)
         }
     }
 
