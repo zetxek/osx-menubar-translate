@@ -24,7 +24,7 @@ Requirements: macOS 12.4+.
 - **Services menu integration**: select text in any app → right-click → Services → Translate in MenuTranslate
 - **Right-click menu**: version info (read from Info.plist), About, Quit
 - **No tracking at all**: well, except the tracking Google does on the Translate instance loaded in the embedded WebView — but nothing by me
-- **Sandboxed**: App Sandbox enabled, requesting only outbound network access
+- **Sandboxed**: App Sandbox enabled, requesting outbound network access — plus a read-only user-selected-files entitlement that the project's build settings add and nothing in the app currently uses
 
 Code-wise it might also serve you as a blueprint for embedding a WebView with a service that receives text from other contexts.
 
@@ -42,7 +42,7 @@ A menu bar app has no Edit menu for these to route through, so the app intercept
 
 ## Architecture
 
-~450 lines of Swift across four files:
+~575 lines of Swift across four files:
 
 ```
 User entry points (three, converging on one path)
