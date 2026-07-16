@@ -32,10 +32,22 @@ if [[ -z "$VERSION" ]]; then
     exit 2
 fi
 
+# VERSION is interpolated into the zip name and the copy destination, so reject
+# anything that isn't a plain version before it can write outside the repo.
+if [[ ! "$VERSION" =~ ^[0-9]+(\.[0-9]+)*([A-Za-z0-9.-]*)$ ]]; then
+    echo "error: '$VERSION' doesn't look like a version (expected e.g. 1.2.3)." >&2
+    exit 2
+fi
+
+# All project paths below are relative, so run from the repo root regardless of
+# where the caller invoked this from.
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
 PROJECT="Translate Menu.xcodeproj"
 SCHEME="Translate Menu"
 APP_NAME="Translate Menu.app"
 BUILD_DIR="$(mktemp -d)"
+trap 'rm -rf "$BUILD_DIR"' EXIT
 ZIP="TranslateMenu-${VERSION}.zip"
 KEYCHAIN_PROFILE="notary"
 
@@ -45,10 +57,16 @@ if [[ -d /Applications/Xcode.app ]]; then
     export DEVELOPER_DIR=/Applications/Xcode.app/Contents/Developer
 fi
 
-echo "==> Checking the version in the project matches $VERSION"
-PROJECT_VERSION=$(grep -m1 'MARKETING_VERSION' "$PROJECT/project.pbxproj" | sed 's/.*= *//; s/;//')
-if [[ "$PROJECT_VERSION" != "$VERSION" ]]; then
-    echo "error: MARKETING_VERSION is $PROJECT_VERSION but you asked for $VERSION." >&2
+echo "==> Checking every build configuration is at $VERSION"
+# Check ALL MARKETING_VERSION entries, not just the first. There is one per build
+# configuration (Debug and Release), and they can drift apart — bumping only one
+# would otherwise pass this check while building the other. Quotes are stripped
+# because Xcode wraps values containing punctuation (e.g. "1.2.3-beta").
+PROJECT_VERSIONS=$(grep 'MARKETING_VERSION' "$PROJECT/project.pbxproj" \
+    | sed 's/.*= *//; s/;//; s/"//g' | sort -u)
+if [[ "$PROJECT_VERSIONS" != "$VERSION" ]]; then
+    echo "error: MARKETING_VERSION does not match $VERSION in every configuration." >&2
+    echo "       Found: $(echo "$PROJECT_VERSIONS" | tr '\n' ' ')" >&2
     echo "       Bump MARKETING_VERSION in both build configurations first." >&2
     exit 1
 fi
@@ -118,9 +136,24 @@ for required in x86_64 arm64; do
     fi
 done
 
-if codesign -d --entitlements - --xml "$APP" 2>/dev/null | plutil -p - | grep -q "get-task-allow"; then
+# Read the entitlements once into a variable rather than grepping a pipeline.
+# A pipeline here would hide failure: `if codesign ... | grep -q x` is exempt from
+# set -e, so if codesign produced nothing the grep would simply not match and the
+# check would silently PASS. Capturing first lets us tell "no debug entitlement"
+# apart from "couldn't read the entitlements at all".
+ENTITLEMENTS=$(codesign -d --entitlements - --xml "$APP" 2>/dev/null || true)
+if [[ -z "$ENTITLEMENTS" ]]; then
+    echo "error: could not read entitlements from the built app." >&2
+    echo "       Refusing to ship something we cannot inspect." >&2
+    exit 1
+fi
+if grep -q "get-task-allow" <<<"$ENTITLEMENTS"; then
     echo "error: the app carries com.apple.security.get-task-allow (debug entitlement)." >&2
     echo "       Notarization will reject this. Is CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO set?" >&2
+    exit 1
+fi
+if ! grep -q "com.apple.security.app-sandbox" <<<"$ENTITLEMENTS"; then
+    echo "error: the app is not sandboxed. Expected com.apple.security.app-sandbox." >&2
     exit 1
 fi
 
