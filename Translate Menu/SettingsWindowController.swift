@@ -36,6 +36,9 @@ final class SettingsWindowController: NSWindowController {
 
     private let recorder = ShortcutRecorderView()
     private let statusLabel = NSTextField(labelWithString: "")
+    private let selectionCheckbox = NSButton(checkboxWithTitle: "Translate selected text", target: nil, action: nil)
+    private let permissionLabel = NSTextField(labelWithString: "")
+    private let permissionButton = NSButton(title: "Open System Settings", target: nil, action: nil)
 
     init(shortcut: GlobalShortcut?,
          applyShortcut: @escaping (GlobalShortcut) -> String?,
@@ -43,7 +46,7 @@ final class SettingsWindowController: NSWindowController {
         self.applyShortcut = applyShortcut
         self.clearShortcut = clearShortcut
 
-        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 420, height: 150),
+        let window = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 420, height: 250),
                               styleMask: [.titled, .closable],
                               backing: .buffered,
                               defer: false)
@@ -52,10 +55,12 @@ final class SettingsWindowController: NSWindowController {
         window.center()
 
         super.init(window: window)
+        window.delegate = self
 
         recorder.shortcut = shortcut
         buildLayout()
         refreshStatus(message: nil)
+        refreshSelectionSection()
     }
 
     @available(*, unavailable)
@@ -93,7 +98,34 @@ final class SettingsWindowController: NSWindowController {
         statusLabel.lineBreakMode = .byWordWrapping
         statusLabel.maximumNumberOfLines = 2
 
-        for view in [title, explanation, recorder, clearButton, statusLabel] {
+        selectionCheckbox.target = self
+        selectionCheckbox.action = #selector(toggleTranslateSelection)
+
+        let selectionExplanation = NSTextField(labelWithString: "Translate whatever is selected when you press the shortcut.")
+        selectionExplanation.font = .systemFont(ofSize: 11)
+        selectionExplanation.textColor = .secondaryLabelColor
+
+        permissionLabel.font = .systemFont(ofSize: 11)
+        permissionLabel.lineBreakMode = .byWordWrapping
+        permissionLabel.maximumNumberOfLines = 3
+
+        permissionButton.target = self
+        permissionButton.action = #selector(openAccessibilitySettings)
+        permissionButton.bezelStyle = .rounded
+        permissionButton.controlSize = .small
+
+        statusLabel.font = .systemFont(ofSize: 11)
+        statusLabel.textColor = .secondaryLabelColor
+        statusLabel.lineBreakMode = .byWordWrapping
+        statusLabel.maximumNumberOfLines = 2
+
+        let divider = NSBox()
+        divider.boxType = .separator
+
+        let views: [NSView] = [title, explanation, recorder, clearButton, statusLabel,
+                               divider, selectionCheckbox, selectionExplanation,
+                               permissionLabel, permissionButton]
+        for view in views {
             view.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview(view)
         }
@@ -115,8 +147,65 @@ final class SettingsWindowController: NSWindowController {
 
             statusLabel.leadingAnchor.constraint(equalTo: title.leadingAnchor),
             statusLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            statusLabel.topAnchor.constraint(equalTo: recorder.bottomAnchor, constant: 12),
+            statusLabel.topAnchor.constraint(equalTo: recorder.bottomAnchor, constant: 10),
+
+            divider.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            divider.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            divider.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 12),
+
+            selectionCheckbox.leadingAnchor.constraint(equalTo: title.leadingAnchor),
+            selectionCheckbox.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 12),
+
+            selectionExplanation.leadingAnchor.constraint(equalTo: title.leadingAnchor),
+            selectionExplanation.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            selectionExplanation.topAnchor.constraint(equalTo: selectionCheckbox.bottomAnchor, constant: 2),
+
+            permissionLabel.leadingAnchor.constraint(equalTo: title.leadingAnchor),
+            permissionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
+            permissionLabel.topAnchor.constraint(equalTo: selectionExplanation.bottomAnchor, constant: 8),
+
+            permissionButton.leadingAnchor.constraint(equalTo: title.leadingAnchor),
+            permissionButton.topAnchor.constraint(equalTo: permissionLabel.bottomAnchor, constant: 6),
         ])
+    }
+
+    /// The checkbox stores the user's *intent*; whether it can actually work depends on a
+    /// permission macOS controls. Those are tracked separately on purpose — a ticked box
+    /// that silently does nothing is the failure this avoids.
+    @objc
+    private func toggleTranslateSelection() {
+        let wantsIt = selectionCheckbox.state == .on
+        Preferences.setTranslateSelection(wantsIt)
+
+        if wantsIt && !SelectionReader.isPermitted {
+            // Only prompt when the user asks for the feature — never on launch.
+            SelectionReader.requestPermission()
+        }
+        refreshSelectionSection()
+    }
+
+    @objc
+    private func openAccessibilitySettings() {
+        SelectionReader.openSettingsPane()
+    }
+
+    private func refreshSelectionSection() {
+        selectionCheckbox.state = Preferences.translateSelection() ? .on : .off
+
+        let wantsIt = Preferences.translateSelection()
+        let permitted = SelectionReader.isPermitted
+
+        // Only nag when the user has actually asked for the feature.
+        let needsPermission = wantsIt && !permitted
+        permissionLabel.isHidden = !needsPermission
+        permissionButton.isHidden = !needsPermission
+
+        if needsPermission {
+            permissionLabel.stringValue = "Reading the selection needs Accessibility permission. "
+                + "Allow “Translate Menu” in System Settings, then it will work. "
+                + "Until then the shortcut opens an empty window."
+            permissionLabel.textColor = .systemOrange
+        }
     }
 
     @objc
@@ -155,5 +244,14 @@ final class SettingsWindowController: NSWindowController {
         showWindow(nil)
         window?.makeKeyAndOrderFront(nil)
         window?.orderFrontRegardless()
+        refreshSelectionSection()
+    }
+}
+
+extension SettingsWindowController: NSWindowDelegate {
+    /// Granting Accessibility happens in System Settings, outside this app, so the user
+    /// comes back to a window whose warning is stale. Re-check whenever it regains focus.
+    func windowDidBecomeKey(_ notification: Notification) {
+        refreshSelectionSection()
     }
 }

@@ -14,9 +14,12 @@
 		0AC0CE1F1C81AEF700305ACF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE1E1C81AEF700305ACF /* Images.xcassets */; };
 		0AC0CE271C81B02B00305ACF /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC0CE261C81B02B00305ACF /* WebKit.framework */; };
 		0C660F7BC3B445480E693D12 /* HotKeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA311E6C91A796D25B41C5AE /* HotKeyCenter.swift */; };
+		0F43D88901CAC4D648CF0665 /* SelectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242DC78DB06713515350345F /* SelectionTests.swift */; };
 		15BA783BB0F7C25D1A25CC5F /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3455DA34E0783A9FE5E372F8 /* SettingsWindowController.swift */; };
 		5077E61A2CEA791500EFBF1B /* TranslateWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077E6192CEA791500EFBF1B /* TranslateWebView.swift */; };
+		5CD83229C3FD21330123EDAC /* Preferences.swift in Sources */ = {isa = PBXBuildFile; fileRef = F46ECE0DDA3D7CD271824D9D /* Preferences.swift */; };
 		6F814C345FFE89CECEE73347 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 182AC6B3CA0EEFCD8EB7D9E3 /* Cocoa.framework */; };
+		740F51ADE06A48D439109FDB /* SelectionReader.swift in Sources */ = {isa = PBXBuildFile; fileRef = B47EAD52718E7B08FDB8C014 /* SelectionReader.swift */; };
 		90CBC726DE69E6FCEF510C9E /* ShortcutRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169A7A70292E08096E5B0C30 /* ShortcutRecorderView.swift */; };
 		A52AB4D43D4F4566A8EFDBD0 /* GlobalShortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20929A7335927D0F6F1C42A1 /* GlobalShortcut.swift */; };
 		E7DE0D3B2344A24C00A9CBAD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = E7DE0D3A2344A24C00A9CBAD /* MainMenu.xib */; };
@@ -45,13 +48,16 @@
 		182AC6B3CA0EEFCD8EB7D9E3 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		1C702E9D9F89868E3D4CD62C /* Translate MenuTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Translate MenuTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		20929A7335927D0F6F1C42A1 /* GlobalShortcut.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GlobalShortcut.swift; path = "Translate Menu/GlobalShortcut.swift"; sourceTree = SOURCE_ROOT; };
+		242DC78DB06713515350345F /* SelectionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SelectionTests.swift; path = "Translate MenuTests/SelectionTests.swift"; sourceTree = SOURCE_ROOT; };
 		3455DA34E0783A9FE5E372F8 /* SettingsWindowController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsWindowController.swift; path = "Translate Menu/SettingsWindowController.swift"; sourceTree = SOURCE_ROOT; };
 		5077E6192CEA791500EFBF1B /* TranslateWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateWebView.swift; sourceTree = SOURCE_ROOT; };
 		507C65442D1ABDF00074FB46 /* Translate Menu.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Translate Menu.entitlements"; path = "Translate Menu/Translate Menu.entitlements"; sourceTree = SOURCE_ROOT; };
 		78A6BBCB1ADCB5EE00554D13 /* Translate Menu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Translate Menu.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B47EAD52718E7B08FDB8C014 /* SelectionReader.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SelectionReader.swift; path = "Translate Menu/SelectionReader.swift"; sourceTree = SOURCE_ROOT; };
 		DA311E6C91A796D25B41C5AE /* HotKeyCenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HotKeyCenter.swift; path = "Translate Menu/HotKeyCenter.swift"; sourceTree = SOURCE_ROOT; };
 		E7DE0D382344A22D00A9CBAD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = "Translate Menu/Info.plist"; sourceTree = SOURCE_ROOT; };
 		E7DE0D3A2344A24C00A9CBAD /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = "Translate Menu/MainMenu.xib"; sourceTree = SOURCE_ROOT; };
+		F46ECE0DDA3D7CD271824D9D /* Preferences.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Preferences.swift; path = "Translate Menu/Preferences.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +84,7 @@
 			isa = PBXGroup;
 			children = (
 				054AE720EF7A4AABBCC1B727 /* GlobalShortcutTests.swift */,
+				242DC78DB06713515350345F /* SelectionTests.swift */,
 			);
 			name = "Translate MenuTests";
 			sourceTree = "<group>";
@@ -126,6 +133,8 @@
 				DA311E6C91A796D25B41C5AE /* HotKeyCenter.swift */,
 				169A7A70292E08096E5B0C30 /* ShortcutRecorderView.swift */,
 				3455DA34E0783A9FE5E372F8 /* SettingsWindowController.swift */,
+				F46ECE0DDA3D7CD271824D9D /* Preferences.swift */,
+				B47EAD52718E7B08FDB8C014 /* SelectionReader.swift */,
 			);
 			name = "Translate Menu";
 			path = Quotes;
@@ -246,6 +255,8 @@
 				0C660F7BC3B445480E693D12 /* HotKeyCenter.swift in Sources */,
 				90CBC726DE69E6FCEF510C9E /* ShortcutRecorderView.swift in Sources */,
 				15BA783BB0F7C25D1A25CC5F /* SettingsWindowController.swift in Sources */,
+				5CD83229C3FD21330123EDAC /* Preferences.swift in Sources */,
+				740F51ADE06A48D439109FDB /* SelectionReader.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,6 +265,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FC32F2806B452F8026449579 /* GlobalShortcutTests.swift in Sources */,
+				0F43D88901CAC4D648CF0665 /* SelectionTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

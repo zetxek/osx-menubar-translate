@@ -124,13 +124,22 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// The shortcut behaves exactly like clicking the menu bar icon.
+    /// The shortcut behaves like clicking the menu bar icon, and additionally translates
+    /// the current selection if the user has asked for that.
+    ///
+    /// The selection is read *before* showing the popover: showing it first would make us
+    /// the frontmost app and there would be no other app's selection left to read.
     private func toggleFromShortcut() {
         if popover.isShown {
             closePopover(sender: nil)
-        } else {
-            showPopover(sender: nil)
+            return
         }
+
+        if Preferences.translateSelection(), let text = SelectionReader.readSelection() {
+            translateViewController.loadText(text: text)
+        }
+
+        showPopover(sender: nil)
     }
 
     /// Right-click menu: Settings…
