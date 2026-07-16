@@ -86,6 +86,7 @@ xcodebuild -project "Translate Menu.xcodeproj" -scheme "Translate Menu" \
 - Fixed the window closing when clicking IME candidates while typing Chinese (outside-click detection now uses mouse coordinates)
 - Fixed cmd+C/V/A breaking while Caps Lock is on
 - Fixed the loading spinner spinning forever on reopen or when the network drops
+- Fixed translations getting stuck on "…" after closing the popover mid-translation (the suspended WebContent process drops the in-flight request and Google's page never retries — reopening now re-triggers it)
 - Fixed the menu version number being hardcoded in the xib and drifting from the real version
 - Added dark mode, and a white-flash guard while loading
 
