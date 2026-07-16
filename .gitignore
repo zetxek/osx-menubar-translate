@@ -21,3 +21,6 @@ xcuserdata/
 *.moved-aside
 *.xccheckout
 *.xcscmblueprint
+
+## Release artifacts (built by scripts/release.sh)
+TranslateMenu-*.zip

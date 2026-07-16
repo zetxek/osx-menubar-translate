@@ -13,9 +13,13 @@ You can open the application from your menubar, as well as from the macOS contex
 ## Download
 
 Get the latest binary from [the releases section](https://github.com/zetxek/osx-menubar-translate/releases).
-Unzip the file and drag & drop it into the Applications folder. Ready!
+Unzip the file and drag & drop it into the Applications folder.
 
-Requirements: macOS 12.4+.
+**The first time you open it, right-click the app and choose Open** (rather than double-clicking), then confirm. macOS will otherwise refuse to launch it, saying it can't verify the developer.
+
+That's because the app isn't notarized — notarization requires a paid Apple Developer Program membership, and this is a free app I maintain in my spare time. The build is ad-hoc signed instead, exactly as previous releases have been. You only need the right-click once; afterwards it opens normally.
+
+Requirements: macOS 12.4+, Intel or Apple Silicon.
 
 ## Features
 
@@ -77,6 +81,29 @@ xcodebuild -project "Translate Menu.xcodeproj" -scheme "Translate Menu" \
   CODE_SIGN_IDENTITY="-" CODE_SIGN_STYLE=Manual \
   DEVELOPMENT_TEAM="" PROVISIONING_PROFILE_SPECIFIER=""
 ```
+
+### Cutting a release (maintainers)
+
+`scripts/release.sh <version>` builds, packages and verifies a release, refusing to continue if anything is wrong. Bump `MARKETING_VERSION` in both build configurations first.
+
+```bash
+scripts/release.sh 1.2.3 --adhoc
+gh release create v1.2.3 ./TranslateMenu-1.2.3.zip --title "v1.2.3" --notes-file notes.md
+```
+
+`--adhoc` is currently required, because notarization needs an active Apple Developer Program membership and this project's has expired. An expired membership silently drops you to a free "Personal Team", which cannot create a Developer ID certificate or notarize at all — Xcode will only offer you Apple Development certificates.
+
+If the membership is ever renewed, drop `--adhoc` and the script will sign with Developer ID, notarize, staple and verify Gatekeeper accepts the result. That also needs a notarytool keychain profile named `notary`:
+
+```bash
+xcrun notarytool store-credentials notary \
+  --apple-id <your-apple-id> --team-id <your-team-id> \
+  --password <app-specific-password>
+```
+
+The app-specific password comes from appleid.apple.com → Sign-In and Security → App-Specific Passwords. It is not your Apple ID password.
+
+The script's flags matter. `-destination 'generic/platform=macOS'` is what produces a universal binary — without it `xcodebuild` builds only the host architecture, which is how v1.2.1 shipped arm64-only. `CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO` strips the `get-task-allow` debug entitlement, which notarization rejects. The script verifies both before submitting.
 
 ## Fixes in this release
 
