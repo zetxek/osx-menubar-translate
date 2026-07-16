@@ -21,26 +21,27 @@
 
 import Cocoa
 
-/// App 進入點。負責三件事：
-/// 1. 建立選單列（menu bar）狀態圖示，處理左鍵（開關 popover）與右鍵（顯示選單）
-/// 2. 管理翻譯 popover 的生命週期（顯示、關閉、點擊外部自動關閉）
-/// 3. 註冊 macOS「服務」選單入口，讓其他 App 選取文字後可直接送進來翻譯
+/// App entry point. Responsible for three things:
+/// 1. Creating the menu bar status item, handling left-click (toggle popover) and right-click (show menu)
+/// 2. Managing the translate popover's lifecycle (show, close, auto-close on outside click)
+/// 3. Registering the macOS Services menu entry so other apps can send selected text here to translate
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-    /// 右鍵選單（定義在 MainMenu.xib，含「關於」與「結束」）
+    /// Right-click menu (defined in MainMenu.xib; contains About and Quit)
     @IBOutlet weak var statusMenu: NSMenu!
 
-    /// 選單列上的狀態圖示
+    /// The status item in the menu bar
     var statusItem: NSStatusItem!
-    /// 承載翻譯畫面的 popover 視窗
+    /// Popover window hosting the translate UI
     let popover = NSPopover()
-    /// 翻譯畫面的控制器（App 存活期間常駐，維持 WebView 已載入狀態以求秒開）
+    /// Translate UI controller. Kept alive for the app's lifetime so the WebView stays
+    /// loaded and the popover opens instantly.
     let translateViewController = TranslateViewController(nibName: "TranslateViewController", bundle: nil)
-    /// 全域滑鼠點擊監聽器，用來偵測「點擊 popover 以外的地方」以自動關閉
+    /// Global mouse click monitor, used to detect clicks outside the popover and auto-close it
     var eventMonitor: EventMonitor?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // 建立選單列圖示；isTemplate 讓圖示自動適應深色／淺色選單列
+        // Create the menu bar icon; isTemplate lets it adapt to light/dark menu bars automatically
         statusItem = NSStatusBar.system.statusItem(withLength: 32)
 
         let image = NSImage(named: "TranslateStatusBarButtonImage")
@@ -49,18 +50,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         if let button = statusItem.button {
             button.image = image
             button.action = #selector(statusItemButtonActivated(sender:))
-            // 只在滑鼠「按下」時觸發：mouseUp 也觸發的話，每次點擊會多跑一次空轉
+            // Fire on mouse-down only: also firing on mouseUp would run the action a second time per click
             button.sendAction(on: [.leftMouseDown, .rightMouseDown])
         }
 
         popover.contentViewController = translateViewController
-        // 關閉時機完全由程式控制（不用 .transient），避免輸入法等系統視窗搶焦點時誤關
+        // Dismissal is controlled entirely in code (not .transient), so system windows such as
+        // IME candidate lists stealing focus don't close it
         popover.behavior = .applicationDefined
 
-        // ponytail: geometry check keeps IME candidate clicks (which overlap the
-        // popover but belong to the input-method process) from dismissing it
-        // 全域監聽只會收到「其他程序」的點擊。用「滑鼠座標是否落在 popover 框內」判斷，
-        // 而不是比對視窗身分——因為輸入法候選字視窗屬於輸入法程序，點候選字不該關閉 popover
+        // Global monitors only see clicks from other processes. Decide by whether the mouse
+        // location falls inside the popover's frame rather than by window identity: IME
+        // candidate windows belong to the input-method process and overlap the popover, and
+        // clicking a candidate must not dismiss it.
         eventMonitor = EventMonitor(mask: [.leftMouseDown, .rightMouseDown]) { [unowned self] event in
             guard self.popover.isShown,
                   let frame = self.popover.contentViewController?.view.window?.frame,
@@ -70,29 +72,30 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             self.closePopover(sender: event)
         }
 
-        // 版本號從 Info.plist 動態帶入，不寫死在 xib（xib 裡的「Version」只是佔位字串）
+        // Version is read from Info.plist at runtime rather than hardcoded in the xib
+        // (the xib's "Version" title is just a placeholder)
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
         statusMenu.item(at: 0)?.title = "Version \(version)"
 
-        // 註冊為「服務」提供者（對應 Info.plist 的 NSServices 宣告）
+        // Register as a Services provider (matches the NSServices declaration in Info.plist)
         NSApplication.shared.servicesProvider = self
     }
 
-    /// 選單列圖示被點擊：左鍵開關 popover，右鍵（或 control+左鍵）顯示選單。
+    /// Status item clicked: left-click toggles the popover, right-click (or control+left-click) shows the menu.
     @IBAction
     func statusItemButtonActivated(sender: AnyObject?) {
-        // Decide from the triggering event, not live mouse state — by the time
-        // this runs the button may already be released and a state read misses the click.
-        // 一律用「觸發這次 action 的事件」判斷，不能讀滑鼠即時狀態：
-        // 主執行緒忙碌時 action 會延遲執行，等跑到這裡手指早已放開，
-        // 讀即時狀態會誤判成「沒有點擊」而把這次點擊吃掉（舊版「有時要點兩次」的根因）
+        // Decide from the triggering event, not live mouse state: when the main thread is busy
+        // the action runs late, by which point the button is already released. Reading live
+        // state then misses the click entirely — the root cause of the old "sometimes needs
+        // two clicks" bug.
         let event = NSApp.currentEvent
         let isSecondary = event?.type == .rightMouseDown
             || event?.modifierFlags.contains(.control) == true
 
         if isSecondary {
-            // 暫時掛上選單再模擬點擊，是讓 NSStatusItem 顯示選單的標準做法；
-            // 用完立刻拿掉，否則之後的左鍵會變成開選單而不是開 popover
+            // Temporarily attaching the menu then simulating a click is the standard way to make
+            // NSStatusItem show a menu. Detach it immediately after, or subsequent left-clicks
+            // would open the menu instead of the popover.
             statusItem.menu = self.statusMenu
             statusItem.button?.performClick(nil)
             statusItem.menu = nil
@@ -103,15 +106,15 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         }
     }
 
-    /// 顯示 popover 並把鍵盤焦點交給翻譯輸入框。
+    /// Shows the popover and hands keyboard focus to the translate input field.
     func showPopover(sender: AnyObject?) {
         guard let button = statusItem.button else { return }
 
-        // 選單列 App 平常不是作用中 App，必須主動 activate 才能接收鍵盤輸入
+        // A menu bar app isn't normally the active app; it must activate explicitly to receive keyboard input
         NSApp.activate(ignoringOtherApps: true)
         popover.show(relativeTo: button.bounds, of: button, preferredEdge: .minY)
 
-        // popover 的視窗要等 show 之後的下一個 runloop 才存在，所以 async 一拍再抓焦點
+        // The popover's window doesn't exist until the runloop turn after show(), so defer focus by one hop
         DispatchQueue.main.async {
             self.popover.contentViewController?.view.window?.orderFrontRegardless()
             self.translateViewController.focusInputIfPossible()
@@ -120,14 +123,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         eventMonitor?.start()
     }
 
-    /// 關閉 popover 並停止全域點擊監聽（不用時不留監聽器，避免無謂負載）。
+    /// Closes the popover and stops the global click monitor (no monitor lingers while unused).
     func closePopover(sender: AnyObject?) {
         popover.performClose(sender)
         eventMonitor?.stop()
     }
 
-    /// macOS「服務」選單入口：其他 App 選取文字 →「Translate in MenuTranslate」→ 這裡。
-    /// 系統會把選取的文字放進 pasteboard 傳入。
+    /// macOS Services menu entry point: text selected in another app → "Translate in MenuTranslate" → here.
+    /// The system passes the selected text in via the pasteboard.
     @objc
     func translateService(_ pasteboard: NSPasteboard,
                           userData: String,
@@ -138,13 +141,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         showPopover(sender: nil)
     }
 
-    /// 右鍵選單「結束」。
+    /// Right-click menu: Quit.
     @IBAction
     func quitApp(_ sender: Any) {
         NSApplication.shared.terminate(self)
     }
 
-    /// 右鍵選單「關於」：開啟專案 GitHub 頁面。
+    /// Right-click menu: About — opens the project's GitHub page.
     @IBAction
     func aboutMenuActivated(sender: AnyObject?) {
         NSWorkspace.shared.open(URL(string: "https://github.com/zetxek/osx-menubar-translate")!)
