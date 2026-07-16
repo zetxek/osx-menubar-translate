@@ -78,6 +78,30 @@ xcodebuild -project "Translate Menu.xcodeproj" -scheme "Translate Menu" \
   DEVELOPMENT_TEAM="" PROVISIONING_PROFILE_SPECIFIER=""
 ```
 
+### Cutting a release (maintainers)
+
+`scripts/release.sh <version>` builds, notarizes, staples and packages a release, refusing to continue if anything is wrong. It needs two one-time setup steps:
+
+1. A **Developer ID Application** certificate in your login keychain (create at developer.apple.com → Certificates → + → Developer ID Application, then download and open it). This is what lets the app run on other people's Macs without a Gatekeeper warning — an App Store distribution certificate won't do.
+2. A notarytool keychain profile named `notary`:
+
+   ```bash
+   xcrun notarytool store-credentials notary \
+     --apple-id <your-apple-id> --team-id <your-team-id> \
+     --password <app-specific-password>
+   ```
+
+   Generate the app-specific password at appleid.apple.com → Sign-In and Security → App-Specific Passwords. It is not your Apple ID password.
+
+Then bump `MARKETING_VERSION` in both build configurations and run:
+
+```bash
+scripts/release.sh 1.2.3
+gh release create v1.2.3 ./TranslateMenu-1.2.3.zip --title "v1.2.3" --notes-file notes.md
+```
+
+The script's flags matter. `-destination 'generic/platform=macOS'` is what produces a universal binary — without it `xcodebuild` builds only the host architecture, which is how v1.2.1 shipped arm64-only. `CODE_SIGN_INJECT_BASE_ENTITLEMENTS=NO` strips the `get-task-allow` debug entitlement, which notarization rejects. The script verifies both before submitting.
+
 ## Fixes in this release
 
 - Fixed pasting text containing quotes, backslashes or newlines (hand-rolled JS escaping replaced with JSON encoding)
