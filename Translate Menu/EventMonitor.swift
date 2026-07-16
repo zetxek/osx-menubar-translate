@@ -21,11 +21,11 @@
 
 import Cocoa
 
-/// 全域滑鼠事件監聽器的薄封裝。
-/// 用來偵測「使用者點了 popover 以外的地方」以便自動關閉 popover。
+/// Thin wrapper around a global mouse event monitor.
+/// Used to detect clicks outside the popover so it can be dismissed automatically.
 ///
-/// 注意：NSEvent 的全域監聽只會收到「其他 App」的事件，
-/// 點擊本 App 自己的視窗（popover 本身）不會觸發，所以不會自己關自己。
+/// Note: NSEvent global monitors only receive events from *other* apps. Clicks on our
+/// own windows (the popover itself) don't fire it, so the popover can't dismiss itself.
 public class EventMonitor {
     private var monitor: AnyObject?
     private let mask: NSEvent.EventTypeMask
@@ -40,13 +40,15 @@ public class EventMonitor {
         stop()
     }
 
-    /// 開始監聽。已在監聽中則不重複註冊（重複註冊會造成 handler 被呼叫多次）。
+    /// Starts monitoring. No-op if already running — registering twice would invoke
+    /// the handler once per registration.
     public func start() {
         guard monitor == nil else { return }
         monitor = NSEvent.addGlobalMonitorForEvents(matching: mask, handler: handler) as AnyObject?
     }
 
-    /// 停止監聽並釋放。popover 關閉時就停，不讓監聽器閒置空轉。
+    /// Stops monitoring and releases the monitor. Called when the popover closes so
+    /// no monitor lingers while unused.
     public func stop() {
         guard let monitor else { return }
         NSEvent.removeMonitor(monitor)
