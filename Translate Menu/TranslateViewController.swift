@@ -22,32 +22,35 @@
 import Cocoa
 import WebKit
 
-/// popover 的內容控制器：承載一個載入 Google 翻譯網頁的 WKWebView。
-/// WebView 只載入一次、App 存活期間常駐——用約 100MB 記憶體換「點圖示秒開」，
-/// 不必每次開啟都等 2-3 秒重新載入。
+/// The popover's content controller: hosts a WKWebView loading the Google Translate page.
+/// The WebView loads once and stays resident for the app's lifetime — trading ~100MB of
+/// memory for an instant open, instead of a 2-3s reload every time.
 class TranslateViewController: NSViewController, WKNavigationDelegate {
     @IBOutlet var webView: TranslateWebView!
     @IBOutlet var webViewContainer: NSView!
-    /// 頁面載入中的轉圈指示器
+    /// Spinner shown while the page loads
     @IBOutlet var progressIndicator: NSProgressIndicator!
 
-    /// 首頁是否已載入過（只在第一次顯示時載入）
+    /// Whether the initial page has loaded (loads only on first appearance)
     var urlLoaded = false
-    /// 冷啟動暫存區：view 還沒載入時就收到的翻譯文字，先存這裡，
-    /// 等 viewWillAppear 再補載。沒有它，冷啟動後第一次服務呼叫的文字會被丟掉
+    /// Cold-start stash: text arriving before the view has loaded is held here and loaded
+    /// in viewWillAppear. Without it, the first Services invocation after a cold start
+    /// drops its text.
     private var pendingText: String?
-    /// Google 翻譯網址，text 參數帶要翻譯的文字
+    /// Google Translate URL; the text parameter carries the string to translate
     let defaultUrl = "https://translate.google.com?text="
 
     override func viewWillAppear() {
         super.viewWillAppear()
 
-        // 只有第一次顯示才載入頁面；之後開關 popover 都沿用已載入的頁面。
-        // 轉圈指示器也只在這裡開——每次顯示都開的話，沒有導航去關它，會永遠轉下去
+        // Load the page only on first appearance; later opens reuse the loaded page.
+        // The spinner starts only here too — starting it on every appearance would leave it
+        // spinning forever, since no navigation follows to stop it.
         if !urlLoaded {
             urlLoaded = true
             installDarkModeStyle()
-            // 載入期間的底色跟隨系統外觀，避免深色模式下開啟瞬間閃白底
+            // Match the under-page background to the system appearance to avoid a white flash
+            // while loading in dark mode
             webView.underPageBackgroundColor = .windowBackgroundColor
             progressIndicator.isHidden = false
             progressIndicator.startAnimation(nil)
@@ -59,15 +62,16 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
 
     override func viewDidAppear() {
         super.viewDidAppear()
-        // 每次 popover 顯示都重新把焦點放進輸入框，使用者可以直接打字
+        // Re-focus the input on every appearance so the user can type immediately
         focusInputIfPossible()
         retranslateIfNeeded()
     }
 
-    /// 救回卡在「…」的翻譯：popover 關閉時行程休眠（或 Google 後端偶發丟棄）
-    /// 會殺死飛行中的翻譯請求，而 Google 頁面沒有重試機制、會永遠等下去。
-    /// 每次重開 popover 對輸入框補發一個 input 事件，強制頁面重發翻譯請求；
-    /// 輸入框是空的就什麼都不做。
+    /// Recovers translations stuck on "…": closing the popover suspends the WebContent
+    /// process (and Google's backend occasionally drops requests), killing the in-flight
+    /// translation — and Google's page never retries, so it waits forever. Re-dispatch an
+    /// input event on the textarea whenever the popover reappears to force a fresh request.
+    /// Does nothing if the input is empty.
     private func retranslateIfNeeded() {
         let js = """
         (function() {
@@ -86,22 +90,23 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
         }
     }
 
-    /// 頁面載入完成：收轉圈、把焦點放進輸入框。
+    /// Page finished loading: stop the spinner and focus the input.
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         hideProgress()
 
-        // 稍等 0.1 秒讓頁面的 JS 初始化完，focus 才抓得到輸入框
+        // Wait 0.1s for the page's own JS to initialize, otherwise focus can't find the input
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) { [weak self] in
             self?.focusInputIfPossible()
         }
     }
 
-    /// 載入中途失敗（例如斷網）：收轉圈，不能讓它永遠轉下去。
+    /// Navigation failed mid-load (e.g. the network dropped): stop the spinner so it doesn't spin forever.
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         hideProgress()
     }
 
-    /// 連線階段就失敗（例如 DNS 解析不到、新載入取消舊載入）：同樣收轉圈。
+    /// Failed during the provisional phase (e.g. DNS failure, or a new load cancelling an
+    /// old one): stop the spinner here too.
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
         hideProgress()
     }
@@ -111,8 +116,8 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
         progressIndicator.isHidden = true
     }
 
-    /// 載入一段要翻譯的文字（「服務」選單的入口會呼叫）。
-    /// view 還沒載入時（冷啟動）先暫存，等 viewWillAppear 再一起載。
+    /// Loads a string to translate (called from the Services menu entry point).
+    /// If the view hasn't loaded yet (cold start), stash the text for viewWillAppear.
     public func loadText(text: String) {
         guard isViewLoaded, webView != nil else {
             pendingText = text
@@ -124,9 +129,10 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
         webView.load(getTranslateURL(textToTranslate: text))
     }
 
-    /// 把要翻譯的文字組成 Google 翻譯網址。
-    /// 額外把 `;/?:@&=+$, ` 等字元也做百分比編碼——這些字元在 query 值裡雖然「合法」，
-    /// 但會被當成參數分隔符號，不編碼的話文字會在 `&` 或 `+` 處被截斷
+    /// Builds the Google Translate URL for the given text.
+    /// Also percent-encodes `;/?:@&=+$, ` — these are technically legal inside a query
+    /// value but act as parameter separators, so leaving them raw truncates the text at
+    /// `&` or `+`.
     public func getTranslateURL(textToTranslate: String) -> URLRequest {
         var allowedQueryParamAndKey = CharacterSet.urlQueryAllowed
         allowedQueryParamAndKey.remove(charactersIn: ";/?:@&=+$, ")
@@ -137,31 +143,34 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
         return URLRequest(url: url)
     }
 
-    /// 注入跟隨系統的深色模式樣式。Google 翻譯網頁版沒有深色主題（其
-    /// prefers-color-scheme 規則只管頂端帳號列圖示），所以用 CSS 濾鏡整頁反轉。
-    /// 包在 @media 查詢裡：WKWebView 會把 App 的外觀狀態傳給頁面，
-    /// 系統切換深淺色時頁面即時跟隨，不需要任何開關或重載。
-    /// 不依賴 Google 的 class 名稱（都是混淆過的），頁面改版不易失效。
+    /// Injects a system-following dark mode style. Google Translate's web page has no dark
+    /// theme of its own (its prefers-color-scheme rules only cover the top account-bar
+    /// icons), so invert the whole page with a CSS filter. Wrapping it in an @media query
+    /// means WKWebView passes the app's appearance through to the page, so it follows
+    /// light/dark switches live with no toggle and no reload. It doesn't depend on Google's
+    /// class names (all obfuscated), so it survives their page redesigns.
     private func installDarkModeStyle() {
         let js = """
         const style = document.createElement('style');
         style.textContent = `
         @media (prefers-color-scheme: dark) {
-          /* invert(0.88)：純白 -> #1f1f1f 柔和深灰、純黑文字 -> #e0e0e0，比 invert(1) 的死黑舒服。
-             背景宣告白色，經濾鏡反轉後才是深色（濾鏡會連 html 自己的背景一起反轉，
-             直接寫深色反而會被轉回淺色）。 */
+          /* invert(0.88): pure white -> #1f1f1f soft dark grey, pure black text -> #e0e0e0 —
+             easier on the eyes than invert(1)'s dead black.
+             The background is declared white so the filter inverts it into a dark colour: the
+             filter inverts html's own background too, so declaring it dark would flip it back
+             to light. */
           html { filter: invert(0.88) hue-rotate(180deg); background: #fff; }
           img, video, iframe { filter: invert(1) hue-rotate(180deg); }
         }`;
         document.documentElement.appendChild(style);
         """
-        // atDocumentStart：頁面還沒開始繪製就掛上樣式，深色模式下不會先閃白再變暗
+        // atDocumentStart: attach the style before the page paints, so dark mode doesn't flash white first
         webView.configuration.userContentController.addUserScript(
             WKUserScript(source: js, injectionTime: .atDocumentStart, forMainFrameOnly: true))
     }
 
-    /// 把鍵盤焦點交給網頁裡的翻譯輸入框（分兩層：先讓視窗成為 key window
-    /// 並把 first responder 給 WebView，再用 JS 把游標放進頁面的輸入框）。
+    /// Hands keyboard focus to the page's translate input, in two layers: make the window
+    /// key and the WebView first responder, then use JS to put the caret in the page's input.
     public func focusInputIfPossible() {
         guard isViewLoaded, let window = view.window else { return }
 
@@ -169,14 +178,14 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
         window.makeKeyAndOrderFront(nil)
         window.makeFirstResponder(webView)
 
-        // 等 0.05 秒讓視窗焦點先穩定，再注入 JS 抓輸入框
+        // Wait 0.05s for window focus to settle before injecting the JS that grabs the input
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) { [weak self] in
             self?.focusWebInputElement()
         }
     }
 
-    /// 用 JS 在頁面裡找輸入框並 focus。選擇器由具體到寬鬆排列，
-    /// Google 翻譯改版換 DOM 結構時比較不容易全部失效。
+    /// Finds and focuses the page's input via JS. Selectors run specific → loose, so a
+    /// Google Translate DOM change is less likely to break all of them at once.
     private func focusWebInputElement() {
         guard view.window != nil else { return }
 
