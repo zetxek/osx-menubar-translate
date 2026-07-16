@@ -13,7 +13,11 @@
 		0AC0CE1D1C81AEEF00305ACF /* TranslateViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE181C81AEEF00305ACF /* TranslateViewController.xib */; };
 		0AC0CE1F1C81AEF700305ACF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE1E1C81AEF700305ACF /* Images.xcassets */; };
 		0AC0CE271C81B02B00305ACF /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC0CE261C81B02B00305ACF /* WebKit.framework */; };
+		0C660F7BC3B445480E693D12 /* HotKeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA311E6C91A796D25B41C5AE /* HotKeyCenter.swift */; };
+		15BA783BB0F7C25D1A25CC5F /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3455DA34E0783A9FE5E372F8 /* SettingsWindowController.swift */; };
 		5077E61A2CEA791500EFBF1B /* TranslateWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077E6192CEA791500EFBF1B /* TranslateWebView.swift */; };
+		90CBC726DE69E6FCEF510C9E /* ShortcutRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169A7A70292E08096E5B0C30 /* ShortcutRecorderView.swift */; };
+		A52AB4D43D4F4566A8EFDBD0 /* GlobalShortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20929A7335927D0F6F1C42A1 /* GlobalShortcut.swift */; };
 		E7DE0D3B2344A24C00A9CBAD /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = E7DE0D3A2344A24C00A9CBAD /* MainMenu.xib */; };
 /* End PBXBuildFile section */
 
@@ -24,9 +28,13 @@
 		0AC0CE181C81AEEF00305ACF /* TranslateViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = TranslateViewController.xib; path = "Translate Menu/TranslateViewController.xib"; sourceTree = SOURCE_ROOT; };
 		0AC0CE1E1C81AEF700305ACF /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = "Translate Menu/Images.xcassets"; sourceTree = SOURCE_ROOT; };
 		0AC0CE261C81B02B00305ACF /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
+		169A7A70292E08096E5B0C30 /* ShortcutRecorderView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ShortcutRecorderView.swift; path = "Translate Menu/ShortcutRecorderView.swift"; sourceTree = SOURCE_ROOT; };
+		20929A7335927D0F6F1C42A1 /* GlobalShortcut.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = GlobalShortcut.swift; path = "Translate Menu/GlobalShortcut.swift"; sourceTree = SOURCE_ROOT; };
+		3455DA34E0783A9FE5E372F8 /* SettingsWindowController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsWindowController.swift; path = "Translate Menu/SettingsWindowController.swift"; sourceTree = SOURCE_ROOT; };
 		5077E6192CEA791500EFBF1B /* TranslateWebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TranslateWebView.swift; sourceTree = SOURCE_ROOT; };
 		507C65442D1ABDF00074FB46 /* Translate Menu.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = "Translate Menu.entitlements"; path = "Translate Menu/Translate Menu.entitlements"; sourceTree = SOURCE_ROOT; };
 		78A6BBCB1ADCB5EE00554D13 /* Translate Menu.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Translate Menu.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		DA311E6C91A796D25B41C5AE /* HotKeyCenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HotKeyCenter.swift; path = "Translate Menu/HotKeyCenter.swift"; sourceTree = SOURCE_ROOT; };
 		E7DE0D382344A22D00A9CBAD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = "Translate Menu/Info.plist"; sourceTree = SOURCE_ROOT; };
 		E7DE0D3A2344A24C00A9CBAD /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = "Translate Menu/MainMenu.xib"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
@@ -72,6 +80,10 @@
 				5077E6192CEA791500EFBF1B /* TranslateWebView.swift */,
 				0AC0CE1E1C81AEF700305ACF /* Images.xcassets */,
 				E7DE0D382344A22D00A9CBAD /* Info.plist */,
+				20929A7335927D0F6F1C42A1 /* GlobalShortcut.swift */,
+				DA311E6C91A796D25B41C5AE /* HotKeyCenter.swift */,
+				169A7A70292E08096E5B0C30 /* ShortcutRecorderView.swift */,
+				3455DA34E0783A9FE5E372F8 /* SettingsWindowController.swift */,
 			);
 			name = "Translate Menu";
 			path = Quotes;
@@ -154,6 +166,10 @@
 				0AC0CE1A1C81AEEF00305ACF /* EventMonitor.swift in Sources */,
 				0AC0CE191C81AEEF00305ACF /* AppDelegate.swift in Sources */,
 				0AC0CE1C1C81AEEF00305ACF /* TranslateViewController.swift in Sources */,
+				A52AB4D43D4F4566A8EFDBD0 /* GlobalShortcut.swift in Sources */,
+				0C660F7BC3B445480E693D12 /* HotKeyCenter.swift in Sources */,
+				90CBC726DE69E6FCEF510C9E /* ShortcutRecorderView.swift in Sources */,
+				15BA783BB0F7C25D1A25CC5F /* SettingsWindowController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

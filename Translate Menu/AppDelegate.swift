@@ -44,6 +44,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     let translateViewController = TranslateViewController(nibName: "TranslateViewController", bundle: nil)
     /// Global mouse click monitor, used to detect clicks outside the popover and auto-close it
     var eventMonitor: EventMonitor?
+    /// Registers the user's system-wide shortcut, if they have set one
+    private let hotKeyCenter = HotKeyCenter()
+    /// Kept alive so the window survives being closed and reopened
+    private var settingsWindowController: SettingsWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Create the menu bar icon; isTemplate lets it adapt to light/dark menu bars automatically
@@ -82,10 +86,91 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         let version = Bundle.main.object(forInfoDictionaryKey: "CFBundleShortVersionString") as? String ?? "?"
         statusMenu.item(at: 0)?.title = "Version \(version)"
 
+        // Settings first, so it and Start at Login sit together above the separator,
+        // with About/Quit below it. installStartAtLoginItem() inserts relative to the
+        // index installSettingsMenuItem() leaves behind, so the order here is load-bearing.
+        installSettingsMenuItem()
         installStartAtLoginItem()
+        registerSavedShortcut()
 
         // Register as a Services provider (matches the NSServices declaration in Info.plist)
         NSApplication.shared.servicesProvider = self
+    }
+
+    /// Adds "Settings…" to the right-click menu, above About.
+    private func installSettingsMenuItem() {
+        let item = NSMenuItem(title: "Settings…",
+                              action: #selector(showSettings),
+                              keyEquivalent: "")
+        item.target = self
+        // Index 1: directly under the version line, before About and Quit.
+        statusMenu.insertItem(item, at: 1)
+        statusMenu.insertItem(.separator(), at: 2)
+    }
+
+    /// Restores the user's shortcut at launch. There is no default: nothing is registered
+    /// until the user chooses a combination, because claiming a global hotkey they never
+    /// asked for could silently break one they already use.
+    private func registerSavedShortcut() {
+        guard let shortcut = GlobalShortcut.load() else { return }
+        do {
+            try hotKeyCenter.register(shortcut) { [weak self] in
+                self?.toggleFromShortcut()
+            }
+        } catch {
+            // Another app may have claimed the combination since it was saved. Leave it in
+            // defaults so Settings still shows what the user chose, and say why it is dead.
+            NSLog("AppDelegate: could not register \(shortcut.displayString): \(error)")
+        }
+    }
+
+    /// The shortcut behaves exactly like clicking the menu bar icon.
+    private func toggleFromShortcut() {
+        if popover.isShown {
+            closePopover(sender: nil)
+        } else {
+            showPopover(sender: nil)
+        }
+    }
+
+    /// Right-click menu: Settings…
+    @objc
+    private func showSettings() {
+        if settingsWindowController == nil {
+            settingsWindowController = SettingsWindowController(
+                shortcut: GlobalShortcut.load(),
+                applyShortcut: { [weak self] shortcut in
+                    self?.apply(shortcut)
+                },
+                clearShortcut: { [weak self] in
+                    self?.hotKeyCenter.unregister()
+                    GlobalShortcut.clear()
+                }
+            )
+        }
+        settingsWindowController?.present()
+    }
+
+    /// Registers a newly recorded shortcut and saves it. Returns a message to show the
+    /// user on failure, or nil on success.
+    private func apply(_ shortcut: GlobalShortcut) -> String? {
+        do {
+            try hotKeyCenter.register(shortcut) { [weak self] in
+                self?.toggleFromShortcut()
+            }
+        } catch {
+            // Registration failed, so don't save: defaults must never describe a shortcut
+            // that isn't actually live. Put the previous one back if there was one.
+            if let previous = GlobalShortcut.load() {
+                try? hotKeyCenter.register(previous) { [weak self] in
+                    self?.toggleFromShortcut()
+                }
+            }
+            return "\(shortcut.displayString) is already in use by another app."
+        }
+
+        shortcut.save()
+        return nil
     }
 
     /// Status item clicked: left-click toggles the popover, right-click (or control+left-click) shows the menu.
@@ -148,10 +233,10 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         showPopover(sender: nil)
     }
 
-    /// Adds the "Start at Login" toggle to the right-click menu, just under the version.
-    /// Does nothing before macOS 13: SMAppService doesn't exist there, and the app still
-    /// deploys back to 12.4. Users on 12.x can add the app to Login Items in System
-    /// Settings by hand, which is what this automates.
+    /// Adds the "Start at Login" toggle to the right-click menu, grouped with Settings…
+    /// above the separator. Does nothing before macOS 13: SMAppService doesn't exist
+    /// there, and the app still deploys back to 12.4. Users on 12.x can add the app to
+    /// Login Items in System Settings by hand, which is what this automates.
     private func installStartAtLoginItem() {
         guard #available(macOS 13.0, *) else { return }
 
@@ -159,7 +244,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                               action: #selector(toggleStartAtLogin(_:)),
                               keyEquivalent: "")
         item.target = self
-        statusMenu.insertItem(item, at: 1)
+        // Index 2: right after "Settings…", before the separator installSettingsMenuItem()
+        // left at that index. Assumes installSettingsMenuItem() has already run.
+        statusMenu.insertItem(item, at: 2)
         startAtLoginItem = item
 
         // The state can change outside the app (System Settings > General > Login Items),
