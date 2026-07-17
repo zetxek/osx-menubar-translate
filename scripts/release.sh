@@ -2,8 +2,12 @@
 #
 # Build, notarize, staple and package a release build of Translate Menu.
 #
-# Usage:  scripts/release.sh 1.2.3            # signed + notarized (needs paid membership)
-#         scripts/release.sh 1.2.3 --adhoc    # ad-hoc signed, NOT notarized
+# Usage:  scripts/release.sh X.Y.Z            # signed + notarized (needs paid membership)
+#         scripts/release.sh X.Y.Z --adhoc    # ad-hoc signed, NOT notarized
+#
+# X.Y.Z must match MARKETING_VERSION in the Xcode project — the script checks
+# this and refuses to run otherwise (see below). Run with no arguments to see
+# what the project is currently set to.
 #
 # Prerequisites for the default (notarized) path — see README "Cutting a release":
 #   - An active Apple Developer Program membership
@@ -21,6 +25,20 @@
 
 set -euo pipefail
 
+# All project paths below are relative, so run from the repo root regardless of
+# where the caller invoked this from. Done early — before the usage message —
+# so that message can read the project's actual current version below.
+cd "$(dirname "${BASH_SOURCE[0]}")/.."
+
+PROJECT="Translate Menu.xcodeproj"
+
+# Read once up front so the usage/error messages can show it. A hardcoded example
+# version here would drift out of date the next time MARKETING_VERSION is bumped —
+# it did exactly that after 1.2.4 (flagged by Copilot on the bump PR) — and a
+# copy-pasted stale example then fails the check further down for a non-obvious reason.
+CURRENT_VERSION=$(grep -m1 'MARKETING_VERSION' "$PROJECT/project.pbxproj" \
+    | sed 's/.*= *//; s/;//; s/"//g')
+
 VERSION="${1:-}"
 ADHOC=no
 if [[ "${2:-}" == "--adhoc" ]]; then
@@ -28,22 +46,17 @@ if [[ "${2:-}" == "--adhoc" ]]; then
 fi
 
 if [[ -z "$VERSION" ]]; then
-    echo "usage: $0 <version> [--adhoc]   (e.g. $0 1.2.3)" >&2
+    echo "usage: $0 <version> [--adhoc]   (project is currently at $CURRENT_VERSION)" >&2
     exit 2
 fi
 
 # VERSION is interpolated into the zip name and the copy destination, so reject
 # anything that isn't a plain version before it can write outside the repo.
 if [[ ! "$VERSION" =~ ^[0-9]+(\.[0-9]+)*([A-Za-z0-9.-]*)$ ]]; then
-    echo "error: '$VERSION' doesn't look like a version (expected e.g. 1.2.3)." >&2
+    echo "error: '$VERSION' doesn't look like a version (expected e.g. 1.0.0)." >&2
     exit 2
 fi
 
-# All project paths below are relative, so run from the repo root regardless of
-# where the caller invoked this from.
-cd "$(dirname "${BASH_SOURCE[0]}")/.."
-
-PROJECT="Translate Menu.xcodeproj"
 SCHEME="Translate Menu"
 APP_NAME="Translate Menu.app"
 BUILD_DIR="$(mktemp -d)"

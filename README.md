@@ -88,9 +88,13 @@ xcodebuild -project "Translate Menu.xcodeproj" -scheme "Translate Menu" \
 `scripts/release.sh <version>` builds, packages and verifies a release, refusing to continue if anything is wrong. Bump `MARKETING_VERSION` in both build configurations first.
 
 ```bash
-scripts/release.sh 1.2.3 --adhoc
-gh release create v1.2.3 ./TranslateMenu-1.2.3.zip --title "v1.2.3" --notes-file notes.md
+scripts/release.sh X.Y.Z --adhoc
+gh release create vX.Y.Z ./TranslateMenu-X.Y.Z.zip --title "vX.Y.Z" --notes-file notes.md
 ```
+
+Replace `X.Y.Z` with the version you just bumped to. `scripts/release.sh` refuses to run
+if it doesn't match `MARKETING_VERSION`, and prints the project's current version if you
+run it with no arguments.
 
 `--adhoc` is currently required, because notarization needs an active Apple Developer Program membership and this project's has expired. An expired membership silently drops you to a free "Personal Team", which cannot create a Developer ID certificate or notarize at all — Xcode will only offer you Apple Development certificates.
 
