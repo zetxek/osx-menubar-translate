@@ -41,6 +41,7 @@ final class SettingsWindowController: NSWindowController {
     private let permissionButton = NSButton(title: "Open System Settings", target: nil, action: nil)
 
     init(shortcut: GlobalShortcut?,
+         initialError: String? = nil,
          applyShortcut: @escaping (GlobalShortcut) -> String?,
          clearShortcut: @escaping () -> Void) {
         self.applyShortcut = applyShortcut
@@ -59,7 +60,10 @@ final class SettingsWindowController: NSWindowController {
 
         recorder.shortcut = shortcut
         buildLayout()
-        refreshStatus(message: nil)
+        // Surfaces a shortcut that was saved but failed to register at launch — e.g.
+        // another app has since claimed the combination. Without this the window would
+        // show the old shortcut as if it were live, with nothing registered behind it.
+        refreshStatus(message: initialError, isError: initialError != nil)
         refreshSelectionSection()
     }
 

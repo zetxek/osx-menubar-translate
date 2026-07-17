@@ -46,17 +46,26 @@ final class ShortcutRecorderView: NSView {
         didSet { needsDisplay = true }
     }
 
+    /// The modifiers currently held during a recording session, captured from
+    /// `flagsChanged` rather than read live from `NSEvent.modifierFlags` at draw time.
+    /// Keeping our own copy makes what's on screen a function of the events this view
+    /// actually received, not of whatever the keyboard happens to be doing when AppKit
+    /// gets around to calling `draw(_:)`.
+    private var recordingModifiers: NSEvent.ModifierFlags = []
+
     override var acceptsFirstResponder: Bool { true }
     override var isFlipped: Bool { true }
 
     override func becomeFirstResponder() -> Bool {
         isRecording = true
+        recordingModifiers = []
         return true
     }
 
     override func resignFirstResponder() -> Bool {
         isRecording = false
         showsModifierHint = false
+        recordingModifiers = []
         return true
     }
 
@@ -94,6 +103,10 @@ final class ShortcutRecorderView: NSView {
     /// the user holds ⌘ waiting to pick a key.
     override func flagsChanged(with event: NSEvent) {
         guard isRecording else { return }
+        recordingModifiers = event.modifierFlags
+        // A fresh modifier press means the user is trying again — don't leave a stale
+        // "Add ⌘, ⌥ or ⌃" error on screen once they've started doing exactly that.
+        showsModifierHint = false
         needsDisplay = true
     }
 
@@ -137,7 +150,7 @@ final class ShortcutRecorderView: NSView {
         if showsModifierHint { return "Add ⌘, ⌥ or ⌃" }
         if isRecording {
             // Echo the modifiers already held, so the field responds while the user decides.
-            let held = NSEvent.modifierFlags.intersection([.command, .option, .control, .shift])
+            let held = recordingModifiers.intersection([.command, .option, .control, .shift])
             if !held.isEmpty, let partial = GlobalShortcut(keyCode: 0, modifiers: held) {
                 return String(partial.displayString.dropLast(GlobalShortcut.keyName(for: 0).count))
             }

@@ -119,7 +119,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         } catch {
             // Another app may have claimed the combination since it was saved. Leave it in
-            // defaults so Settings still shows what the user chose, and say why it is dead.
+            // defaults rather than clearing it — showSettings() checks hotKeyCenter.isRegistered
+            // against this and surfaces the failure there, instead of the window silently
+            // claiming a shortcut that isn't actually live.
             NSLog("AppDelegate: could not register \(shortcut.displayString): \(error)")
         }
     }
@@ -146,8 +148,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @objc
     private func showSettings() {
         if settingsWindowController == nil {
+            let saved = GlobalShortcut.load()
+            // A saved shortcut that failed to register at launch (its combination may
+            // have been claimed by another app since) would otherwise show as live with
+            // nothing actually registered behind it.
+            let initialError = (saved != nil && !hotKeyCenter.isRegistered)
+                ? "\(saved!.displayString) could not be registered — another app may already use it."
+                : nil
+
             settingsWindowController = SettingsWindowController(
-                shortcut: GlobalShortcut.load(),
+                shortcut: saved,
+                initialError: initialError,
                 applyShortcut: { [weak self] shortcut in
                     self?.apply(shortcut)
                 },
@@ -169,10 +180,18 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             }
         } catch {
             // Registration failed, so don't save: defaults must never describe a shortcut
-            // that isn't actually live. Put the previous one back if there was one.
+            // that isn't actually live. Put the previous one back if there was one — and
+            // if that fails too (its own combination could have been claimed since), clear
+            // defaults rather than leave them pointing at a shortcut that isn't registered.
             if let previous = GlobalShortcut.load() {
-                try? hotKeyCenter.register(previous) { [weak self] in
-                    self?.toggleFromShortcut()
+                do {
+                    try hotKeyCenter.register(previous) { [weak self] in
+                        self?.toggleFromShortcut()
+                    }
+                } catch {
+                    GlobalShortcut.clear()
+                    return "\(shortcut.displayString) is already in use, and your previous "
+                        + "shortcut could no longer be restored either. Shortcut cleared."
                 }
             }
             return "\(shortcut.displayString) is already in use by another app."
