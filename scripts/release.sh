@@ -179,18 +179,26 @@ echo "    version:       $BUILT_VERSION"
 echo "    signature:     $(codesign -dv --verbose=2 "$APP" 2>&1 | grep '^Authority' | head -1 | sed 's/Authority=//')"
 
 echo "==> Packaging"
-# Strip AppleDouble (._*) files and resource-fork junk from the bundle before
-# zipping. dot_clean -m merges ._ files back into their data-fork counterparts
-# and removes the now-empty AppleDouble files. The find -delete below is a
+# Strip AppleDouble (._*) files and resource-fork junk from a bundle.
+# dot_clean -m merges ._ files back into their data-fork counterparts and
+# removes the now-empty AppleDouble files. The find -delete is a
 # belt-and-suspenders pass for anything dot_clean missed (e.g. inside
-# _CodeSignature). This prevents the defect seen in v1.2.4 (issue #21) where
-# ._ files inside the bundle invalidated the code signature.
-dot_clean -m "$APP"
-find "$APP" -name '._*' -delete
-if find "$APP" -name '._*' | grep -q .; then
-    echo "error: AppleDouble (._*) files remain in the bundle after dot_clean." >&2
-    exit 1
-fi
+# _CodeSignature). The final guard errors if any ._ files survive, so a
+# half-cleaned bundle never makes it into the zip.
+clean_bundle() {
+    # $1 = path to the .app bundle
+    local bundle="$1"
+    dot_clean -m "$bundle"
+    find "$bundle" -name '._*' -delete
+    if find "$bundle" -name '._*' | grep -q .; then
+        echo "error: AppleDouble (._*) files remain in the bundle after dot_clean." >&2
+        exit 1
+    fi
+}
+
+# Strip the bundle before zipping. This prevents the defect seen in v1.2.4
+# (issue #21) where ._ files inside the bundle invalidated the code signature.
+clean_bundle "$APP"
 
 # ditto, not `zip` — it preserves the bundle's symlinks.  --norsrc --noextattr
 # --noqtn strip resource forks, extended attributes, and quarantine flags so
@@ -209,16 +217,22 @@ verify_zip() {
     local zip_path="$1"
     local verify_dir
     verify_dir="$(mktemp -d)"
-    # Always clean up the temp dir, even on failure.
-    trap 'rm -rf "$verify_dir"' RETURN
 
-    ditto -x -k --norsrc --noextattr "$zip_path" "$verify_dir"
+    if ! ditto -x -k --norsrc --noextattr "$zip_path" "$verify_dir"; then
+        echo "error: failed to extract zip for verification: $zip_path" >&2
+        rm -rf "$verify_dir"
+        return 1
+    fi
 
     local extracted_app="$verify_dir/$APP_NAME"
 
-    if find "$extracted_app" -name '._*' | grep -q .; then
+    local stray_files
+    stray_files="$(find "$extracted_app" -name '._*')"
+    if [[ -n "$stray_files" ]]; then
         echo "error: AppleDouble (._*) files found inside the zip: $zip_path" >&2
-        find "$extracted_app" -name '._*' | sed 's/^/       /' >&2
+        # shellcheck disable=SC2001 # sed is needed for multi-line prefixing; ${var//} can't do line-by-line
+        echo "$stray_files" | sed 's/^/       /' >&2
+        rm -rf "$verify_dir"
         return 1
     fi
 
@@ -226,8 +240,11 @@ verify_zip() {
         echo "error: codesign --verify --deep --strict failed on the extracted app." >&2
         echo "       Running codesign --verify --verbose for details:" >&2
         codesign --verify --deep --strict --verbose=2 "$extracted_app" 2>&1 | sed 's/^/       /' >&2
+        rm -rf "$verify_dir"
         return 1
     fi
+
+    rm -rf "$verify_dir"
     echo "    zip verified: no AppleDouble files, codesign --verify --deep --strict passed"
 }
 
@@ -244,8 +261,7 @@ if [[ "$ADHOC" == no ]]; then
     xcrun stapler staple "$APP"
     rm -f "$BUILD_DIR/$ZIP"
     # Re-strip after stapling, since stapler may have modified the bundle.
-    dot_clean -m "$APP"
-    find "$APP" -name '._*' -delete
+    clean_bundle "$APP"
     ditto_zip "$APP_NAME" "$ZIP"
 
     echo "==> Verifying the re-zip is clean and the signature is valid"

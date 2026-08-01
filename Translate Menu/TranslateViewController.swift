@@ -33,6 +33,9 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
 
     /// Whether the initial page has loaded (loads only on first appearance)
     var urlLoaded = false
+    /// The currently in-flight navigation, used to ignore stale/cancelled callbacks
+    /// from superseded loads (e.g. when a new load cancels an old one).
+    private var activeNavigation: WKNavigation?
     /// Cold-start stash: text arriving before the view has loaded is held here and loaded
     /// in viewWillAppear. Without it, the first Services invocation after a cold start
     /// drops its text.
@@ -55,7 +58,7 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
             progressIndicator.isHidden = false
             progressIndicator.startAnimation(nil)
             webView.navigationDelegate = self
-            webView.load(getTranslateURL(textToTranslate: pendingText ?? ""))
+            activeNavigation = webView.load(getTranslateURL(textToTranslate: pendingText ?? ""))
             pendingText = nil
         }
     }
@@ -92,6 +95,8 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
 
     /// Page finished loading: stop the spinner and focus the input.
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        guard navigation === activeNavigation else { return }
+        activeNavigation = nil
         hideProgress()
 
         // Wait 0.1s for the page's own JS to initialize, otherwise focus can't find the input
@@ -102,14 +107,22 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
 
     /// Navigation failed mid-load (e.g. the network dropped): stop the spinner so it doesn't spin forever.
     /// Reset urlLoaded so a later retry reloads the page instead of showing a permanently blank popover.
+    /// Ignores cancellations from superseded loads and stale callbacks from old navigations.
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        guard navigation === activeNavigation else { return }
+        if (error as NSError).code == NSURLErrorCancelled { return }
+        activeNavigation = nil
         urlLoaded = false
         hideProgress()
     }
 
     /// Failed during the provisional phase (e.g. DNS failure, or a new load cancelling an
     /// old one): stop the spinner here too. Reset urlLoaded for the same reason as above.
+    /// Ignores cancellations from superseded loads and stale callbacks from old navigations.
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        guard navigation === activeNavigation else { return }
+        if (error as NSError).code == NSURLErrorCancelled { return }
+        activeNavigation = nil
         urlLoaded = false
         hideProgress()
     }
