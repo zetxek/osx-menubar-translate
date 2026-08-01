@@ -239,7 +239,10 @@ verify_zip() {
     if ! codesign --verify --deep --strict "$extracted_app" 2>/dev/null; then
         echo "error: codesign --verify --deep --strict failed on the extracted app." >&2
         echo "       Running codesign --verify --verbose for details:" >&2
-        codesign --verify --deep --strict --verbose=2 "$extracted_app" 2>&1 | sed 's/^/       /' >&2
+        # `|| true`: codesign exits non-zero here by definition, and with `set -o
+        # pipefail` that would abort the script before the cleanup below runs.
+        { codesign --verify --deep --strict --verbose=2 "$extracted_app" 2>&1 || true; } \
+            | sed 's/^/       /' >&2
         rm -rf "$verify_dir"
         return 1
     fi
