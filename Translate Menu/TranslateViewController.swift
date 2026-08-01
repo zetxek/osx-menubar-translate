@@ -36,6 +36,10 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
     /// The currently in-flight navigation, used to ignore stale/cancelled callbacks
     /// from superseded loads (e.g. when a new load cancels an old one).
     private var activeNavigation: WKNavigation?
+    /// Whether the dark-mode user script has been registered. User scripts accumulate
+    /// in the shared configuration, so a retry after a failed load (urlLoaded reset)
+    /// must not register the same script again.
+    private var darkModeScriptInstalled = false
     /// Cold-start stash: text arriving before the view has loaded is held here and loaded
     /// in viewWillAppear. Without it, the first Services invocation after a cold start
     /// drops its text.
@@ -166,6 +170,10 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
     /// light/dark switches live with no toggle and no reload. It doesn't depend on Google's
     /// class names (all obfuscated), so it survives their page redesigns.
     private func installDarkModeStyle() {
+        // One-time registration: addUserScript accumulates in the shared configuration,
+        // so re-entering via a urlLoaded retry would otherwise stack duplicate scripts.
+        guard !darkModeScriptInstalled else { return }
+        darkModeScriptInstalled = true
         let js = """
         const style = document.createElement('style');
         style.textContent = `
