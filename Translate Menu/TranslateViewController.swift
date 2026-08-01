@@ -33,9 +33,17 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
 
     /// Whether the initial page has loaded (loads only on first appearance)
     var urlLoaded = false
+    /// The currently in-flight navigation, used to ignore stale/cancelled callbacks
+    /// from superseded loads (e.g. when a new load cancels an old one).
+    private var activeNavigation: WKNavigation?
+    /// Whether the dark-mode user script has been registered. User scripts accumulate
+    /// in the shared configuration, so a retry after a failed load (urlLoaded reset)
+    /// must not register the same script again.
+    private var darkModeScriptInstalled = false
     /// Cold-start stash: text arriving before the view has loaded is held here and loaded
     /// in viewWillAppear. Without it, the first Services invocation after a cold start
-    /// drops its text.
+    /// drops its text. Held until a navigation carrying it finishes, so a failed load can
+    /// replay the text instead of reopening on an empty page.
     private var pendingText: String?
     /// Google Translate URL; the text parameter carries the string to translate
     let defaultUrl = "https://translate.google.com?text="
@@ -55,8 +63,7 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
             progressIndicator.isHidden = false
             progressIndicator.startAnimation(nil)
             webView.navigationDelegate = self
-            webView.load(getTranslateURL(textToTranslate: pendingText ?? ""))
-            pendingText = nil
+            activeNavigation = webView.load(getTranslateURL(textToTranslate: pendingText ?? ""))
         }
     }
 
@@ -92,6 +99,10 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
 
     /// Page finished loading: stop the spinner and focus the input.
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        guard navigation === activeNavigation else { return }
+        activeNavigation = nil
+        // The text made it onto the page; nothing left to replay.
+        pendingText = nil
         hideProgress()
 
         // Wait 0.1s for the page's own JS to initialize, otherwise focus can't find the input
@@ -101,13 +112,24 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
     }
 
     /// Navigation failed mid-load (e.g. the network dropped): stop the spinner so it doesn't spin forever.
+    /// Reset urlLoaded so a later retry reloads the page instead of showing a permanently blank popover.
+    /// Ignores cancellations from superseded loads and stale callbacks from old navigations.
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        guard navigation === activeNavigation else { return }
+        if (error as NSError).code == NSURLErrorCancelled { return }
+        activeNavigation = nil
+        urlLoaded = false
         hideProgress()
     }
 
     /// Failed during the provisional phase (e.g. DNS failure, or a new load cancelling an
-    /// old one): stop the spinner here too.
+    /// old one): stop the spinner here too. Reset urlLoaded for the same reason as above.
+    /// Ignores cancellations from superseded loads and stale callbacks from old navigations.
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        guard navigation === activeNavigation else { return }
+        if (error as NSError).code == NSURLErrorCancelled { return }
+        activeNavigation = nil
+        urlLoaded = false
         hideProgress()
     }
 
@@ -119,14 +141,17 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
     /// Loads a string to translate (called from the Services menu entry point).
     /// If the view hasn't loaded yet (cold start), stash the text for viewWillAppear.
     public func loadText(text: String) {
-        guard isViewLoaded, webView != nil else {
-            pendingText = text
-            return
-        }
+        // Stashed unconditionally, not just on the cold-start path: if this navigation
+        // fails, viewWillAppear replays the text on the next open. Cleared in didFinish.
+        pendingText = text
+        guard isViewLoaded, webView != nil else { return }
 
         progressIndicator.isHidden = false
         progressIndicator.startAnimation(nil)
-        webView.load(getTranslateURL(textToTranslate: text))
+        // Track this navigation too: the delegate callbacks below ignore anything that
+        // isn't the active navigation, so without this the spinner started above would
+        // never be stopped by didFinish and every Services translation would spin forever.
+        activeNavigation = webView.load(getTranslateURL(textToTranslate: text))
     }
 
     /// Builds the Google Translate URL for the given text.
@@ -150,6 +175,10 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
     /// light/dark switches live with no toggle and no reload. It doesn't depend on Google's
     /// class names (all obfuscated), so it survives their page redesigns.
     private func installDarkModeStyle() {
+        // One-time registration: addUserScript accumulates in the shared configuration,
+        // so re-entering via a urlLoaded retry would otherwise stack duplicate scripts.
+        guard !darkModeScriptInstalled else { return }
+        darkModeScriptInstalled = true
         let js = """
         const style = document.createElement('style');
         style.textContent = `
