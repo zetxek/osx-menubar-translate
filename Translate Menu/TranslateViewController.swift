@@ -101,13 +101,16 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
     }
 
     /// Navigation failed mid-load (e.g. the network dropped): stop the spinner so it doesn't spin forever.
+    /// Reset urlLoaded so a later retry reloads the page instead of showing a permanently blank popover.
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        urlLoaded = false
         hideProgress()
     }
 
     /// Failed during the provisional phase (e.g. DNS failure, or a new load cancelling an
-    /// old one): stop the spinner here too.
+    /// old one): stop the spinner here too. Reset urlLoaded for the same reason as above.
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+        urlLoaded = false
         hideProgress()
     }
 
