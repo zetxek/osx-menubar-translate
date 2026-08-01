@@ -146,7 +146,10 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
 
         progressIndicator.isHidden = false
         progressIndicator.startAnimation(nil)
-        webView.load(getTranslateURL(textToTranslate: text))
+        // Track this navigation too: the delegate callbacks below ignore anything that
+        // isn't the active navigation, so without this the spinner started above would
+        // never be stopped by didFinish and every Services translation would spin forever.
+        activeNavigation = webView.load(getTranslateURL(textToTranslate: text))
     }
 
     /// Builds the Google Translate URL for the given text.
