@@ -42,7 +42,8 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
     private var darkModeScriptInstalled = false
     /// Cold-start stash: text arriving before the view has loaded is held here and loaded
     /// in viewWillAppear. Without it, the first Services invocation after a cold start
-    /// drops its text.
+    /// drops its text. Held until a navigation carrying it finishes, so a failed load can
+    /// replay the text instead of reopening on an empty page.
     private var pendingText: String?
     /// Google Translate URL; the text parameter carries the string to translate
     let defaultUrl = "https://translate.google.com?text="
@@ -63,7 +64,6 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
             progressIndicator.startAnimation(nil)
             webView.navigationDelegate = self
             activeNavigation = webView.load(getTranslateURL(textToTranslate: pendingText ?? ""))
-            pendingText = nil
         }
     }
 
@@ -101,6 +101,8 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         guard navigation === activeNavigation else { return }
         activeNavigation = nil
+        // The text made it onto the page; nothing left to replay.
+        pendingText = nil
         hideProgress()
 
         // Wait 0.1s for the page's own JS to initialize, otherwise focus can't find the input
@@ -139,10 +141,10 @@ class TranslateViewController: NSViewController, WKNavigationDelegate {
     /// Loads a string to translate (called from the Services menu entry point).
     /// If the view hasn't loaded yet (cold start), stash the text for viewWillAppear.
     public func loadText(text: String) {
-        guard isViewLoaded, webView != nil else {
-            pendingText = text
-            return
-        }
+        // Stashed unconditionally, not just on the cold-start path: if this navigation
+        // fails, viewWillAppear replays the text on the next open. Cleared in didFinish.
+        pendingText = text
+        guard isViewLoaded, webView != nil else { return }
 
         progressIndicator.isHidden = false
         progressIndicator.startAnimation(nil)
