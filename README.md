@@ -25,7 +25,8 @@ Requirements: macOS 12.4+, Intel or Apple Silicon.
 
 - **One click to translate**: the WebView stays resident in memory, so the window opens with no load wait
 - **Dark mode**: follows the system appearance and switches live. Google Translate's web version has no dark theme of its own, so this app implements a soft dark grey via a CSS filter — no reload needed when you switch
-- **Services menu integration**: select text in any app → right-click → Services → Translate in MenuTranslate
+- **Services menu integration**: select text in any app → right-click → Services → Translate in MenuTranslate. Give it a keyboard shortcut in System Settings → Keyboard → Keyboard Shortcuts → Services (see below)
+- **Global shortcut**: set one in Settings… to open the translate window from any app
 - **Right-click menu**: version info (read from Info.plist), Start at Login, About, Quit
 - **Start at Login**: toggle it from the right-click menu (macOS 13+). On macOS 12 the item is hidden — add the app to Login Items in System Settings by hand instead
 - **No tracking at all**: well, except the tracking Google does on the Translate instance loaded in the embedded WebView — but nothing by me
@@ -44,6 +45,28 @@ Available inside the translate window (and while Caps Lock is on):
 | `cmd + v` | **paste** |
 
 A menu bar app has no Edit menu for these to route through, so the app intercepts the key events and bridges them into the page via JavaScript.
+
+### Translating the selection with a keyboard shortcut
+
+The app ships no shortcut for this, because any default would collide: macOS gives Services
+key equivalents lower priority than the frontmost app's own shortcuts, so a popular
+combination (`shift + cmd + t` is "reopen closed tab" in every browser) would silently do
+nothing exactly where you want it most. Pick one that is free for you:
+
+1. System Settings → Keyboard → **Keyboard Shortcuts…** → **Services**
+2. Find **Translate in MenuTranslate** under *Text*
+3. Tick it, double-click the shortcut column, and press the keys you want
+
+Now selecting text in any app and pressing that shortcut opens the window already
+translating it. It needs no Accessibility permission: macOS passes the text to the app
+through the Services pasteboard.
+
+> **Why not read the selection directly?** Earlier versions offered to do that over the
+> Accessibility API. The App Sandbox blocks that API from reading other apps, whatever the
+> user answers to the permission prompt, so the shortcut opened an empty window and the
+> Settings pane promised a permission that could never help
+> ([#21](https://github.com/zetxek/osx-menubar-translate/issues/21)). That path is gone;
+> the Services route is the one that works.
 
 ## Architecture
 

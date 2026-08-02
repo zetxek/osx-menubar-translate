@@ -1,5 +1,27 @@
 # Translate the Selection on Shortcut — Design
 
+> **Superseded (2026-08-02). This design never worked, and was reverted in 1.2.6.**
+>
+> The spike's first finding below — *"Can a sandboxed app be granted Accessibility? **Yes.**
+> … The sandbox is not a blocker"* — checked the wrong thing. It confirmed the app can be
+> *listed and toggled* in System Settings → Privacy & Security → Accessibility, which is
+> true and irrelevant: the App Sandbox blocks the Accessibility API from reading **other
+> processes** however the user answers the prompt. `readSelection()` therefore always
+> returned nil in a released build, and the shortcut opened an empty window
+> ([#21](https://github.com/zetxek/osx-menubar-translate/issues/21)).
+>
+> Verified on 2026-08-02 against a shipped 1.2.5 with the permission genuinely granted (the
+> app's own `AXIsProcessTrusted()` reported true): the selection still never arrived, while
+> an unsandboxed binary running the identical AX calls read it first try.
+>
+> The same trap the spike caught once — mistaking inherited trust from a shell-launched
+> binary for the real thing — very likely also produced the "AX works in Chromium" row.
+> **Lesson: prove the API call succeeds, not that the permission can be granted.**
+>
+> Translating a selection now goes through the Services entry, which needs no permission
+> and works inside the sandbox. Users assign it a shortcut in System Settings → Keyboard →
+> Keyboard Shortcuts → Services.
+
 **Goal:** One shortcut. Press it with text selected and the popover opens already translating that text; press it with nothing selected and it opens empty, exactly as today.
 
 This unifies the global shortcut (#3, PR #19) with what the Services menu entry already does, so there is one key to learn rather than two.

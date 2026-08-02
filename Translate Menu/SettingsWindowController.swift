@@ -36,9 +36,7 @@ final class SettingsWindowController: NSWindowController {
 
     private let recorder = ShortcutRecorderView()
     private let statusLabel = NSTextField(labelWithString: "")
-    private let selectionCheckbox = NSButton(checkboxWithTitle: "Translate selected text", target: nil, action: nil)
-    private let permissionLabel = NSTextField(labelWithString: "")
-    private let permissionButton = NSButton(title: "Open System Settings", target: nil, action: nil)
+    private let servicesButton = NSButton(title: "Open Keyboard Settings", target: nil, action: nil)
 
     init(shortcut: GlobalShortcut?,
          initialError: String? = nil,
@@ -56,7 +54,6 @@ final class SettingsWindowController: NSWindowController {
         window.center()
 
         super.init(window: window)
-        window.delegate = self
 
         recorder.shortcut = shortcut
         buildLayout()
@@ -64,7 +61,6 @@ final class SettingsWindowController: NSWindowController {
         // another app has since claimed the combination. Without this the window would
         // show the old shortcut as if it were live, with nothing registered behind it.
         refreshStatus(message: initialError, isError: initialError != nil)
-        refreshSelectionSection()
     }
 
     @available(*, unavailable)
@@ -102,33 +98,31 @@ final class SettingsWindowController: NSWindowController {
         statusLabel.lineBreakMode = .byWordWrapping
         statusLabel.maximumNumberOfLines = 2
 
-        selectionCheckbox.target = self
-        selectionCheckbox.action = #selector(toggleTranslateSelection)
+        let selectionTitle = NSTextField(labelWithString: "Translate a selection")
+        selectionTitle.font = .boldSystemFont(ofSize: 13)
 
-        let selectionExplanation = NSTextField(labelWithString: "Translate whatever is selected when you press the shortcut.")
+        // No checkbox and no permission here on purpose. This used to offer to read the
+        // selection over the Accessibility API, which the App Sandbox blocks however the
+        // user answers the permission prompt (#21). The Services entry does the same job
+        // with the system handing us the text, so the only thing left to configure is the
+        // keyboard shortcut — and that lives in System Settings, not here.
+        let selectionExplanation = NSTextField(wrappingLabelWithString:
+            "Select text in any app, then right-click → Services → “Translate in MenuTranslate”. "
+            + "To do it from the keyboard, give that service a shortcut under "
+            + "Keyboard Shortcuts → Services.")
         selectionExplanation.font = .systemFont(ofSize: 11)
         selectionExplanation.textColor = .secondaryLabelColor
 
-        permissionLabel.font = .systemFont(ofSize: 11)
-        permissionLabel.lineBreakMode = .byWordWrapping
-        permissionLabel.maximumNumberOfLines = 3
-
-        permissionButton.target = self
-        permissionButton.action = #selector(openAccessibilitySettings)
-        permissionButton.bezelStyle = .rounded
-        permissionButton.controlSize = .small
-
-        statusLabel.font = .systemFont(ofSize: 11)
-        statusLabel.textColor = .secondaryLabelColor
-        statusLabel.lineBreakMode = .byWordWrapping
-        statusLabel.maximumNumberOfLines = 2
+        servicesButton.target = self
+        servicesButton.action = #selector(openKeyboardSettings)
+        servicesButton.bezelStyle = .rounded
+        servicesButton.controlSize = .small
 
         let divider = NSBox()
         divider.boxType = .separator
 
         let views: [NSView] = [title, explanation, recorder, clearButton, statusLabel,
-                               divider, selectionCheckbox, selectionExplanation,
-                               permissionLabel, permissionButton]
+                               divider, selectionTitle, selectionExplanation, servicesButton]
         for view in views {
             view.translatesAutoresizingMaskIntoConstraints = false
             contentView.addSubview(view)
@@ -157,59 +151,25 @@ final class SettingsWindowController: NSWindowController {
             divider.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
             divider.topAnchor.constraint(equalTo: statusLabel.bottomAnchor, constant: 12),
 
-            selectionCheckbox.leadingAnchor.constraint(equalTo: title.leadingAnchor),
-            selectionCheckbox.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 12),
+            selectionTitle.leadingAnchor.constraint(equalTo: title.leadingAnchor),
+            selectionTitle.topAnchor.constraint(equalTo: divider.bottomAnchor, constant: 12),
 
             selectionExplanation.leadingAnchor.constraint(equalTo: title.leadingAnchor),
             selectionExplanation.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            selectionExplanation.topAnchor.constraint(equalTo: selectionCheckbox.bottomAnchor, constant: 2),
+            selectionExplanation.topAnchor.constraint(equalTo: selectionTitle.bottomAnchor, constant: 4),
 
-            permissionLabel.leadingAnchor.constraint(equalTo: title.leadingAnchor),
-            permissionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -20),
-            permissionLabel.topAnchor.constraint(equalTo: selectionExplanation.bottomAnchor, constant: 8),
-
-            permissionButton.leadingAnchor.constraint(equalTo: title.leadingAnchor),
-            permissionButton.topAnchor.constraint(equalTo: permissionLabel.bottomAnchor, constant: 6),
+            servicesButton.leadingAnchor.constraint(equalTo: title.leadingAnchor),
+            servicesButton.topAnchor.constraint(equalTo: selectionExplanation.bottomAnchor, constant: 8),
         ])
     }
 
-    /// The checkbox stores the user's *intent*; whether it can actually work depends on a
-    /// permission macOS controls. Those are tracked separately on purpose — a ticked box
-    /// that silently does nothing is the failure this avoids.
+    /// Opens Keyboard settings, where "Keyboard Shortcuts… → Services" is the place to put
+    /// a shortcut on the Translate service. macOS offers no deeper link than the pane
+    /// itself, hence the wording in the label above.
     @objc
-    private func toggleTranslateSelection() {
-        let wantsIt = selectionCheckbox.state == .on
-        Preferences.setTranslateSelection(wantsIt)
-
-        if wantsIt && !SelectionReader.isPermitted {
-            // Only prompt when the user asks for the feature — never on launch.
-            SelectionReader.requestPermission()
-        }
-        refreshSelectionSection()
-    }
-
-    @objc
-    private func openAccessibilitySettings() {
-        SelectionReader.openSettingsPane()
-    }
-
-    private func refreshSelectionSection() {
-        selectionCheckbox.state = Preferences.translateSelection() ? .on : .off
-
-        let wantsIt = Preferences.translateSelection()
-        let permitted = SelectionReader.isPermitted
-
-        // Only nag when the user has actually asked for the feature.
-        let needsPermission = wantsIt && !permitted
-        permissionLabel.isHidden = !needsPermission
-        permissionButton.isHidden = !needsPermission
-
-        if needsPermission {
-            permissionLabel.stringValue = "Reading the selection needs Accessibility permission. "
-                + "Allow “Translate Menu” in System Settings, then it will work. "
-                + "Until then the shortcut opens an empty window."
-            permissionLabel.textColor = .systemOrange
-        }
+    private func openKeyboardSettings() {
+        guard let url = URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension") else { return }
+        NSWorkspace.shared.open(url)
     }
 
     @objc
@@ -248,14 +208,5 @@ final class SettingsWindowController: NSWindowController {
         showWindow(nil)
         window?.makeKeyAndOrderFront(nil)
         window?.orderFrontRegardless()
-        refreshSelectionSection()
-    }
-}
-
-extension SettingsWindowController: NSWindowDelegate {
-    /// Granting Accessibility happens in System Settings, outside this app, so the user
-    /// comes back to a window whose warning is stale. Re-check whenever it regains focus.
-    func windowDidBecomeKey(_ notification: Notification) {
-        refreshSelectionSection()
     }
 }
