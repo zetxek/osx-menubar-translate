@@ -263,6 +263,11 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         } else {
             NSLog("AppDelegate: Services pasteboard carried no readable text. Types: "
                   + PasteboardText.typeNames(of: pasteboard).joined(separator: ", "))
+            // Load empty rather than leaving the previous translation on screen. Answering
+            // "translate this selection" with an unrelated older translation reads as the
+            // app having ignored the request, and it would also let text stashed by an
+            // earlier failed load replay here, long after the user moved on.
+            translateViewController.loadText(text: "")
         }
 
         showPopover(sender: nil)
