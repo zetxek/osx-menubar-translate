@@ -53,9 +53,13 @@
 				<key>NSServiceCategory</key>
 				<string>public.item</string>
 			</dict>
+			<!-- RTF as well as plain text: apps that only offer a rich-text flavour of the
+			     selection would otherwise not show the service at all. PasteboardText
+			     flattens whatever arrives back to a plain string. -->
 			<key>NSSendTypes</key>
 			<array>
 				<string>NSStringPboardType</string>
+				<string>NSRTFPboardType</string>
 			</array>
 		</dict>
 	</array>
