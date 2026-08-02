@@ -14,7 +14,9 @@
 		0AC0CE1F1C81AEF700305ACF /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 0AC0CE1E1C81AEF700305ACF /* Images.xcassets */; };
 		0AC0CE271C81B02B00305ACF /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0AC0CE261C81B02B00305ACF /* WebKit.framework */; };
 		0C660F7BC3B445480E693D12 /* HotKeyCenter.swift in Sources */ = {isa = PBXBuildFile; fileRef = DA311E6C91A796D25B41C5AE /* HotKeyCenter.swift */; };
+		12CEC867717EE8FE210103BD /* PasteboardTextTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EB7583BACC41F98EB7255D5E /* PasteboardTextTests.swift */; };
 		15BA783BB0F7C25D1A25CC5F /* SettingsWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3455DA34E0783A9FE5E372F8 /* SettingsWindowController.swift */; };
+		3EB1C924D43A3B9E0C04FC43 /* PasteboardText.swift in Sources */ = {isa = PBXBuildFile; fileRef = F9CA5D2CD9E26800DE52D9F2 /* PasteboardText.swift */; };
 		5077E61A2CEA791500EFBF1B /* TranslateWebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5077E6192CEA791500EFBF1B /* TranslateWebView.swift */; };
 		6F814C345FFE89CECEE73347 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 182AC6B3CA0EEFCD8EB7D9E3 /* Cocoa.framework */; };
 		90CBC726DE69E6FCEF510C9E /* ShortcutRecorderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 169A7A70292E08096E5B0C30 /* ShortcutRecorderView.swift */; };
@@ -52,6 +54,8 @@
 		DA311E6C91A796D25B41C5AE /* HotKeyCenter.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = HotKeyCenter.swift; path = "Translate Menu/HotKeyCenter.swift"; sourceTree = SOURCE_ROOT; };
 		E7DE0D382344A22D00A9CBAD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; name = Info.plist; path = "Translate Menu/Info.plist"; sourceTree = SOURCE_ROOT; };
 		E7DE0D3A2344A24C00A9CBAD /* MainMenu.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; name = MainMenu.xib; path = "Translate Menu/MainMenu.xib"; sourceTree = SOURCE_ROOT; };
+		EB7583BACC41F98EB7255D5E /* PasteboardTextTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PasteboardTextTests.swift; path = "Translate MenuTests/PasteboardTextTests.swift"; sourceTree = SOURCE_ROOT; };
+		F9CA5D2CD9E26800DE52D9F2 /* PasteboardText.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PasteboardText.swift; path = "Translate Menu/PasteboardText.swift"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -78,6 +82,7 @@
 			isa = PBXGroup;
 			children = (
 				054AE720EF7A4AABBCC1B727 /* GlobalShortcutTests.swift */,
+				EB7583BACC41F98EB7255D5E /* PasteboardTextTests.swift */,
 			);
 			name = "Translate MenuTests";
 			sourceTree = "<group>";
@@ -126,6 +131,7 @@
 				DA311E6C91A796D25B41C5AE /* HotKeyCenter.swift */,
 				169A7A70292E08096E5B0C30 /* ShortcutRecorderView.swift */,
 				3455DA34E0783A9FE5E372F8 /* SettingsWindowController.swift */,
+				F9CA5D2CD9E26800DE52D9F2 /* PasteboardText.swift */,
 			);
 			name = "Translate Menu";
 			path = Quotes;
@@ -246,6 +252,7 @@
 				0C660F7BC3B445480E693D12 /* HotKeyCenter.swift in Sources */,
 				90CBC726DE69E6FCEF510C9E /* ShortcutRecorderView.swift in Sources */,
 				15BA783BB0F7C25D1A25CC5F /* SettingsWindowController.swift in Sources */,
+				3EB1C924D43A3B9E0C04FC43 /* PasteboardText.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -254,6 +261,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FC32F2806B452F8026449579 /* GlobalShortcutTests.swift in Sources */,
+				12CEC867717EE8FE210103BD /* PasteboardTextTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -420,7 +428,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
-				MARKETING_VERSION = 1.2.6;
+				MARKETING_VERSION = 1.2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "info.adrianmoreno.Translate-Menu";
 				PRODUCT_NAME = "Translate Menu";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -450,7 +458,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 12.4;
-				MARKETING_VERSION = 1.2.6;
+				MARKETING_VERSION = 1.2.7;
 				PRODUCT_BUNDLE_IDENTIFIER = "info.adrianmoreno.Translate-Menu";
 				PRODUCT_NAME = "Translate Menu";
 				PROVISIONING_PROFILE_SPECIFIER = "";

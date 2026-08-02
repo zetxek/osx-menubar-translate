@@ -249,13 +249,27 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
     /// macOS Services menu entry point: text selected in another app → "Translate in MenuTranslate" → here.
     /// The system passes the selected text in via the pasteboard.
+    ///
+    /// The window opens either way. This used to `return` when the pasteboard held nothing
+    /// it could read, which from the outside looked exactly like the app launching and
+    /// doing nothing — the user asked for the translator, so they get the translator, and
+    /// the unreadable case is logged rather than swallowed.
     @objc
     func translateService(_ pasteboard: NSPasteboard,
                           userData: String,
                           error: AutoreleasingUnsafeMutablePointer<NSString?>) {
-        guard let text = pasteboard.string(forType: .string) else { return }
+        if let text = PasteboardText.read(from: pasteboard) {
+            translateViewController.loadText(text: text)
+        } else {
+            NSLog("AppDelegate: Services pasteboard carried no readable text. Types: "
+                  + PasteboardText.typeNames(of: pasteboard).joined(separator: ", "))
+            // Load empty rather than leaving the previous translation on screen. Answering
+            // "translate this selection" with an unrelated older translation reads as the
+            // app having ignored the request, and it would also let text stashed by an
+            // earlier failed load replay here, long after the user moved on.
+            translateViewController.loadText(text: "")
+        }
 
-        translateViewController.loadText(text: text)
         showPopover(sender: nil)
     }
 
