@@ -168,7 +168,16 @@ final class SettingsWindowController: NSWindowController {
     /// itself, hence the wording in the label above.
     @objc
     private func openKeyboardSettings() {
-        guard let url = URL(string: "x-apple.systempreferences:com.apple.Keyboard-Settings.extension") else { return }
+        // Ventura replaced System Preferences' pane identifiers with its own. The new one
+        // silently opens nothing on macOS 12, which this app still supports, so pick by
+        // version rather than shipping a button that does nothing for those users.
+        let pane: String
+        if #available(macOS 13.0, *) {
+            pane = "com.apple.Keyboard-Settings.extension"
+        } else {
+            pane = "com.apple.preference.keyboard"
+        }
+        guard let url = URL(string: "x-apple.systempreferences:\(pane)") else { return }
         NSWorkspace.shared.open(url)
     }
 
