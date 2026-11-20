@@ -27,7 +27,7 @@ Requirements: macOS 12.4+, Intel or Apple Silicon.
 - **Dark mode**: follows the system appearance and switches live. Google Translate's web version has no dark theme of its own, so this app implements a soft dark grey via a CSS filter — no reload needed when you switch
 - **Services menu integration**: select text in any app → right-click → Services → Translate in MenuTranslate. Give it a keyboard shortcut in System Settings → Keyboard → Keyboard Shortcuts → Services (see below)
 - **Global shortcut**: set one in Settings… to open the translate window from any app
-- **Right-click menu**: version info (read from Info.plist), Start at Login, About, Quit
+- **Right-click menu**: version info (read from Info.plist), Settings…, Start at Login, About, Quit
 - **Start at Login**: toggle it from the right-click menu (macOS 13+). On macOS 12 the item is hidden — add the app to Login Items in System Settings by hand instead
 - **No tracking at all**: well, except the tracking Google does on the Translate instance loaded in the embedded WebView — but nothing by me
 - **Sandboxed**: App Sandbox enabled, requesting outbound network access — plus a read-only user-selected-files entitlement that the project's build settings add and nothing in the app currently uses
@@ -70,16 +70,21 @@ through the Services pasteboard.
 
 ## Architecture
 
-~575 lines of Swift across four files:
+~1563 lines of Swift across nine files:
 
 ```
-User entry points (three, converging on one path)
+User entry points (four, converging on one translate path)
 ┌─ Menu bar icon, left click ─┐
-├─ Right-click menu           ─┼─▶ AppDelegate ──▶ TranslateViewController
-└─ System "Services" menu     ─┘        │                   │
-                                  EventMonitor        WKWebView (Google Translate)
-                              (closes on outside click)  TranslateWebView
-                                                       (cmd+C/V/A ↔ JS bridge)
+├─ Right-click menu ──────────┼─▶ AppDelegate ──▶ TranslateViewController
+├─ System "Services" menu ────┤
+└─ Global shortcut ───────────┘
+                                       │                     │
+                                       EventMonitor          WKWebView (Google Translate)
+                                       (outside clicks       TranslateWebView
+                                        close the popover)   (cmd+C/V/A ↔ JS bridge)
+
+Settings… (right-click menu)
+SettingsWindowController ─▶ ShortcutRecorderView ─▶ HotKeyCenter
 ```
 
 | File | Responsibility |
@@ -88,6 +93,11 @@ User entry points (three, converging on one path)
 | `TranslateViewController.swift` | WebView host, translate URL encoding, dark mode injection, focus management |
 | `TranslateWebView.swift` | Keyboard interception, JS bridge between the pasteboard and the page |
 | `EventMonitor.swift` | Global click monitor (detects clicks outside the popover) |
+| `SettingsWindowController.swift` | Settings window: wires the shortcut recorder to persistence and to the caller's re-registration |
+| `GlobalShortcut.swift` | Value type for a key + modifiers: validity rules, display string, UserDefaults round-trip |
+| `ShortcutRecorderView.swift` | Records one key combination from the user and reports it as a `GlobalShortcut` |
+| `HotKeyCenter.swift` | Registers the global hotkey via Carbon's `RegisterEventHotKey` and fires a handler when it triggers |
+| `PasteboardText.swift` | Decodes translatable text out of the pasteboard the Services entry hands over |
 
 ## Building it yourself
 
@@ -104,6 +114,15 @@ xcodebuild -project "Translate Menu.xcodeproj" -scheme "Translate Menu" \
   -configuration Debug build \
   CODE_SIGN_IDENTITY="-" CODE_SIGN_STYLE=Manual \
   DEVELOPMENT_TEAM="" PROVISIONING_PROFILE_SPECIFIER=""
+```
+
+### Tests
+
+`Translate MenuTests/` has `GlobalShortcutTests.swift` (the shortcut rules) and `PasteboardTextTests.swift` (pasteboard decoding). Run them from Xcode, or from the command line:
+
+```bash
+xcodebuild test -project "Translate Menu.xcodeproj" -scheme "Translate Menu" \
+  -destination "platform=macOS" CODE_SIGNING_ALLOWED=NO
 ```
 
 ### Cutting a release (maintainers)
