@@ -44,7 +44,7 @@ Available inside the translate window (and while Caps Lock is on):
 | `cmd + c` | **copy** |
 | `cmd + v` | **paste** |
 
-A menu bar app has no Edit menu for these to route through, so the app intercepts the key events and bridges them into the page via JavaScript.
+A menu bar app has no Edit menu for these to route through, so the app intercepts the key events and bridges them into the page via JavaScript. They are matched on the physical key rather than on the character the layout types, so they work on any input source — Ukrainian, German, or the default US layout.
 
 ### Translating the selection with a keyboard shortcut
 
