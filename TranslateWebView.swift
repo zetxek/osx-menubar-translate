@@ -13,7 +13,9 @@ import WebKit
 ///
 /// Why this is needed: a menu bar app (LSUIElement) has no main menu, so there is no Edit
 /// menu for the system copy/paste shortcuts to route through — pressing them in the WebView
-/// does nothing. Intercept them in keyDown and perform the equivalent operation via JavaScript.
+/// does nothing. Intercept them ourselves and perform the equivalent operation via JavaScript.
+/// The match is on the physical key code (see EditShortcutMatcher), not the layout's
+/// character, so it works on any input source — Ukrainian and German included.
 class TranslateWebView: WKWebView {
 
     override var acceptsFirstResponder: Bool { true }
@@ -28,30 +30,34 @@ class TranslateWebView: WKWebView {
 
     /// Intercepts cmd+C / cmd+V / cmd+A; every other key (including IME composition)
     /// falls through to WebKit's native handling.
-    /// Subtracts capsLock and lowercases the character before matching — otherwise all
-    /// three shortcuts break while Caps Lock is on.
     override func keyDown(with event: NSEvent) {
-        let flags = event.modifierFlags
-            .intersection(.deviceIndependentFlagsMask)
-            .subtracting(.capsLock)
-        let key = event.charactersIgnoringModifiers?.lowercased()
+        if performEditShortcut(for: event) { return }
+        super.keyDown(with: event)
+    }
 
-        switch flags {
-        case [.command] where key == "c":
-            copy(nil)
-            return
+    /// WebKit's own key-equivalent path can consume the command before `keyDown` ever runs
+    /// on some input sources, so catching the shortcut here too is what makes the behaviour
+    /// layout-independent.
+    override func performKeyEquivalent(with event: NSEvent) -> Bool {
+        if performEditShortcut(for: event) { return true }
+        return super.performKeyEquivalent(with: event)
+    }
 
-        case [.command] where key == "v":
-            paste(nil)
-            return
+    /// Runs the edit command for `event` if it is ⌘C / ⌘V / ⌘A. Returns whether it was handled.
+    @discardableResult
+    private func performEditShortcut(for event: NSEvent) -> Bool {
+        let shortcut = EditShortcutMatcher.shortcut(
+            keyCode: event.keyCode,
+            charactersIgnoringModifiers: event.charactersIgnoringModifiers,
+            modifierFlags: event.modifierFlags)
 
-        case [.command] where key == "a":
-            selectAll(nil)
-            return
-
-        default:
-            super.keyDown(with: event)
-        }
+        guard let shortcut = shortcut else { return false }
+         switch shortcut {
+         case .copy: copy(nil)
+         case .paste: paste(nil)
+         case .selectAll: selectAll(nil)
+         }
+         return true
     }
 
     /// Select all: selects the focused input's contents if there is one, otherwise the whole page.
